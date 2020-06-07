@@ -1,0 +1,53 @@
+name: Relase distribution
+
+on:
+  push:
+    branches:
+    - '**'
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Extract
+      id: extract
+      run: |
+        echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+
+    - name: Release
+      uses: satackey/push-prebuilt-action@v0.1
+      with:
+        push-branch: '{branch}-release'
+        js-build-command: yarn run pack 
+
+  test:
+    runs-on: ubuntu-latest
+    needs:
+    - build_and_push
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Extract
+      id: extract
+      run: |
+        echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ steps.extract.outputs.branch }}-release
+        path: action-dlc
+
+    - uses: ./action-dlc
+      with:
+        repotag: aws-cli
+        key: aws-cli-docker-image
