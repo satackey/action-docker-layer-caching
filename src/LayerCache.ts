@@ -70,8 +70,7 @@ class LayerCache {
       ...this.getLayerTarFiles().map(file => `!${file}`)
     ]
     core.info(`Start storing root cache: ${rootKey}`)
-    // const cacheId = await cache.saveCache(paths, rootKey)
-    const cacheId = 0
+    const cacheId = await cache.saveCache(paths, rootKey)
     core.info(`Stored root cache, key: ${rootKey}, id: ${cacheId}`)
     return cacheId
   }
@@ -87,8 +86,7 @@ class LayerCache {
     const key = `layer-${this.key}-${id}`
 
     core.info(`Start storing layer cache: ${key}`)
-    // const cacheId = await cache.saveCache([path], key)
-    const cacheId = 0
+    const cacheId = await cache.saveCache([path], key)
     core.info(`Stored layer cache, key: ${key}, id: ${cacheId}`)
 
     return cacheId
