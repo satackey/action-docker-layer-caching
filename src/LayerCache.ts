@@ -29,9 +29,9 @@ class LayerCache {
   async store(key: string) {
     await this.unpackImage(`${__dirname}/docker_images`)
     this.key = key
-    await this.storeRoot()
-    await this.storeLayers()
-
+    const storeRoot = this.storeRoot()
+    const storeLayers = this.storeLayers()
+    await Promise.all([storeRoot, storeLayers])
   }
 
   async restore(key: string, restoreKeys?: string[]) {
@@ -97,7 +97,7 @@ class LayerCache {
   getLayerTarFiles(): string[] {
     const getTarFilesFromManifest = (manifest: Manifest) => manifest.Layers
     const addStringArray = (tarFilesOfAManifest: string[], tarFiles: string[]) => tarFiles.concat(...tarFilesOfAManifest)
-    
+
     // Todo: use Array#flatMap
     const tarFilesPerManifest = this.manifests.map(getTarFilesFromManifest)
     const tarFiles = tarFilesPerManifest.reduce(addStringArray, [])

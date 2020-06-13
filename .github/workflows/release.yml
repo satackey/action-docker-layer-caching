@@ -24,10 +24,9 @@ jobs:
         echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
 
     - name: Release
-      uses: satackey/push-prebuilt-action@v0.1
+      uses: satackey/push-prebuilt-action@v0.2.0-beta1
       with:
         push-branch: '{branch}-release'
-        js-build-command: yarn run pack 
 
   test:
     runs-on: ubuntu-latest
@@ -35,8 +34,6 @@ jobs:
     - build_and_push
 
     steps:
-    - uses: actions/checkout@v2
-
     - name: Extract
       id: extract
       run: |
@@ -49,5 +46,7 @@ jobs:
 
     - uses: ./action-dlc
       with:
-        repotag: aws-cli
+        repotag: amazon/aws-cli
         key: aws-cli-docker-image
+
+    - run: docker pull amazon/aws-cli
