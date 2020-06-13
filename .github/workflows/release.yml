@@ -24,7 +24,7 @@ jobs:
         echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
 
     - name: Release
-      uses: satackey/push-prebuilt-action@v0.2.0-beta1
+      uses: satackey/push-prebuilt-action@v0.2.0-beta3
       with:
         push-branch: '{branch}-release'
 
