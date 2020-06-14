@@ -7,6 +7,8 @@ const main = async () => {
 
   const layerCache = new LayerCache(repotag)
   await layerCache.store(key)
+  const layercache2 = new LayerCache(repotag)
+  await layercache2.restore(key)
 }
 
 main().catch(e => {
