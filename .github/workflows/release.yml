@@ -62,11 +62,9 @@ jobs:
 
     - uses: actions/cache@v2
       with:
-        path: './root-cache'
+        path: './.action-docker-layer-caching-docker_images'
         key: aws-cli-docker-image-sha-${{ github.sha }}-root
-        restore-keys: |
-          aws-cli-docker-image-sha
-    - run: ls ./root-cache
+    - run: ls ./.action-docker-layer-caching-docker_images
 
   test_restoring:
     runs-on: ubuntu-latest

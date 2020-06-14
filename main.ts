@@ -7,6 +7,7 @@ const main = async () => {
 
   const layerCache = new LayerCache(repotag)
   await layerCache.restore(key)
+  await layerCache.cleanUp()
 }
 
 main().catch(e => {
