@@ -32,9 +32,17 @@ class LayerCache {
     await this.saveImageAsUnpacked()
     await this.separateAllLayerCaches()
     // Todo: remove await
-    const storeRoot = await this.storeRoot()
+    const storeRoot = this.storeRoot()
     const storeLayers = this.storeLayers()
-    await Promise.all([storeRoot, storeLayers])
+    try {
+      await Promise.all([storeRoot, storeLayers])
+    } catch (e) {
+      if (typeof e.message !== 'string' || !e.message.includes(`Cache already exists`)) {
+        throw e
+      }
+      core.info(`Cache already exists, key: ${this.getRootKey()}`)
+      core.debug(e)
+    }
   }
 
   private async saveImageAsUnpacked() {
