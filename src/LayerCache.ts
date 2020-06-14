@@ -95,13 +95,12 @@ class LayerCache {
   }
 
   private async restoreRoot(restoreKeys?: string[]): Promise<boolean> {
+    core.debug(`Trying to restore root cache ID: ${this.getRootKey()}`)
     const restoredCacheKeyMayUndefined = await cache.restoreCache([this.getUnpackedTarDir()], this.getRootKey(), restoreKeys)
     if (restoredCacheKeyMayUndefined === undefined) {
       return false
     }
     this.originalKeyToStore = restoredCacheKeyMayUndefined.replace(/-root$/, '')
-    await this.getManifests()
-
     return true
   }
 
