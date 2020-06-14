@@ -50,6 +50,18 @@ jobs:
         key: aws-cli-docker-image-sha:${{ github.sha }}
 
     - run: docker pull amazon/aws-cli
+  
+  test_hit_root:
+    runs-on: ubuntu-latest
+    needs:
+    - test_saving
+
+    steps:
+    - uses: actions/cache@v2
+      with:
+        path: './root-cache'
+        key: aws-cli-docker-image-sha:${{ github.sha }}
+    - run: ls ./root-cache
 
   test_restoring:
     runs-on: ubuntu-latest
