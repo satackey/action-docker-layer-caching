@@ -8,7 +8,7 @@ import { assertManifests, Manifest, Manifests } from './Tar'
 
 class LayerCache {
   repotag: string
-  key: string = ''
+  originalKeyToStore: string = ''
   tarFile: string = ''
   unpackedTarDir: string = ''
   manifests: Manifests = []
@@ -27,34 +27,17 @@ class LayerCache {
   }
 
   async store(key: string) {
-    await this.unpackImage(`${__dirname}/docker_images`)
-    this.key = key
+    await this.saveImageAsUnpacked()
+    this.originalKeyToStore = key
     const storeRoot = this.storeRoot()
     const storeLayers = this.storeLayers()
     await Promise.all([storeRoot, storeLayers])
   }
 
-  async restore(key: string, restoreKeys?: string[]) {
-
-  }
-
-  private async unpackImage(dir: string) {
-    const path = this.repotag.replace('/', '-') 
-    await this.saveTarTo(`${dir}/${path}.tar`)
-    await this.UnpackTarTo(`${dir}/${path}`)
-  }
-
-  private async saveTarTo(file: string) {
-    await this.exec('mkdir -p', [path.dirname(file)])
-    await this.exec('docker save', ['-o', file, this.repotag])
-    this.tarFile = file
-  }
-
-  private async UnpackTarTo(dir: string) {
-    await this.exec('mkdir -p', [dir])
-    await this.exec('tar xvf', [this.tarFile], { cwd: dir })
-    this.unpackedTarDir = dir
-    await this.getManifests()
+  private async saveImageAsUnpacked() {
+    await this.exec('mkdir -p', [path.dirname(this.getSavedImageTarPath())])
+    await this.exec(`sh -c`, [`docker save '${this.repotag}' | tar xf - -C ${this.getSavedImageTarPath()}`])
+    this.tarFile = this.getSavedImageTarPath()
   }
 
   private async getManifests() {
@@ -64,7 +47,7 @@ class LayerCache {
   }
 
   private async storeRoot() {
-    const rootKey = `${this.key}-root`
+    const rootKey = this.getRootKey()
     const paths = [
       this.unpackedTarDir,
       ...this.getLayerTarFiles().map(file => `!${file}`)
@@ -82,14 +65,91 @@ class LayerCache {
   }
 
   private async storeSingleLayerBy(id: string) {
-    const path = `${this.unpackedTarDir}/${id}/layer.tar`
-    const key = `layer-${this.key}-${id}`
+    const path = this.genSingleLayerStorePath(id)
+    const key = this.genSingleLayerStoreKey(id)
 
     core.info(`Start storing layer cache: ${key}`)
     const cacheId = await cache.saveCache([path], key)
     core.info(`Stored layer cache, key: ${key}, id: ${cacheId}`)
 
     return cacheId
+  }
+
+  // ---
+
+  async restore(key: string, restoreKeys?: string[]) {
+    this.originalKeyToStore = key
+    const hasRestoredRootCache = await this.restoreRoot(restoreKeys)
+    if (!hasRestoredRootCache) {
+      core.info(`Root cache could not be found. aborting.`)
+      return false
+    }
+
+    const hasRestoredAllLayers = await this.restoreLayers()
+    if (!hasRestoredAllLayers) {
+      core.info(`Some layer cache could not be found. aborting.`)
+      return false
+    }
+
+    await this.loadImageFromUnpacked()
+    return true
+  }
+
+  private async restoreRoot(restoreKeys?: string[]): Promise<boolean> {
+    const restoredCacheKeyMayUndefined = await cache.restoreCache([this.getUnpackedTarDir()], this.getRootKey(), restoreKeys)
+    if (restoredCacheKeyMayUndefined === undefined) {
+      return false
+    }
+    this.originalKeyToStore = restoredCacheKeyMayUndefined.replace(/-root$/, '')
+    await this.getManifests()
+
+    return true
+  }
+
+  private async restoreLayers() {
+    const restoring = this.getLayerIds().map(layerId => this.restoreSingleLayerBy(layerId))
+    const hasRestored = await Promise.all(restoring)
+    const FailedToRestore = (restored: Boolean) => !restored
+    return hasRestored.filter(FailedToRestore).length === 0
+  }
+
+  private async restoreSingleLayerBy(id: string): Promise<boolean> {
+    const restoredCacheKeyMayUndefined = await cache.restoreCache([this.genSingleLayerStorePath(id)], this.genSingleLayerStoreKey(id))
+    return typeof restoredCacheKeyMayUndefined === `string`
+  }
+
+  private async loadImageFromUnpacked() {
+    await exec.exec(`sh -c`, [`tar cf - '${this.unpackedTarDir}' | docker load`])
+  }
+
+  // ---
+
+  getImagesDir(): string {
+    return `${__dirname}/docker_images`
+  }
+
+  getUnpackedTarDir(): string {
+    return `${this.getImagesDir()}/${this.getRepotagPathFriendly()}`
+  }
+
+  getSavedImageTarPath(): string {
+    return `${this.getImagesDir()}/${this.getRepotagPathFriendly()}`
+  }
+
+  getRepotagPathFriendly(): string {
+    return this.repotag.replace('/', '-') 
+  }
+
+  getRootKey(): string {
+    return `${this.originalKeyToStore}-root`
+  }
+
+  genSingleLayerStorePath(id: string) {
+    return `${this.unpackedTarDir}/${id}/layer.tar`
+  }
+
+  genSingleLayerStoreKey(id: string) {
+    return `layer-${this.originalKeyToStore}-${id}`
   }
 
   getLayerTarFiles(): string[] {
