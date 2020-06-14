@@ -5,6 +5,7 @@ import * as cache from '@actions/cache'
 import { ExecOptions } from '@actions/exec/lib/interfaces'
 import { promises as fs } from 'fs'
 import { assertManifests, Manifest, Manifests } from './Tar'
+import { dirname } from 'path'
 
 class LayerCache {
   repotag: string
@@ -30,6 +31,7 @@ class LayerCache {
     await this.saveImageAsUnpacked()
     this.originalKeyToStore = key
     // Todo: remove await
+    await this.separateAllLayerCaches()
     const storeRoot = await this.storeRoot()
     const storeLayers = this.storeLayers()
     await Promise.all([storeRoot, storeLayers])
@@ -50,12 +52,30 @@ class LayerCache {
     const rootKey = this.getRootKey()
     const paths = [
       this.getUnpackedTarDir(),
-      ...(await this.getLayerTarFiles()).map(file => `!${file}`)
+      // ...(await this.getLayerTarFiles()).map(file => `!${file}`)
     ]
     core.info(`Start storing root cache: ${rootKey}`)
     const cacheId = await cache.saveCache(paths, rootKey)
     core.info(`Stored root cache, key: ${rootKey}, id: ${cacheId}`)
     return cacheId
+  }
+
+  private async separateAllLayerCaches() {
+    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: this.getUnpackedTarDir()})).toString().split(`\n`)
+    const moveLayer = async (layer: string) => {
+      await fs.mkdir(`${dirname(`${this.getLayerCachesDir()}/${layer}`)}`, { recursive: true })
+      await fs.rename(`${this.getUnpackedTarDir()}/${layer}`, `${this.getLayerCachesDir()}/${layer}`)
+    }
+    await Promise.all(layerTars.map(moveLayer))
+  }
+
+  private async joinAllLayerCaches() {
+    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: this.getLayerCachesDir()})).toString().split(`\n`)
+    const moveLayer = async (layer: string) => {
+      await fs.mkdir(`${dirname(`${this.getUnpackedTarDir()}/${layer}`)}`, { recursive: true })
+      await fs.rename(`${this.getLayerCachesDir()}/${layer}`, `${this.getUnpackedTarDir()}/${layer}`)
+    }
+    await Promise.all(layerTars.map(moveLayer))
   }
 
   private async storeLayers() {
@@ -90,7 +110,7 @@ class LayerCache {
       core.info(`Some layer cache could not be found. aborting.`)
       return false
     }
-
+    await this.joinAllLayerCaches()
     await this.loadImageFromUnpacked()
     return true
   }
@@ -132,6 +152,10 @@ class LayerCache {
     return `${this.getImagesDir()}/${this.getRepotagPathFriendly()}`
   }
 
+  getLayerCachesDir() {
+    return `${this.getUnpackedTarDir()}-layers`
+  }
+
   getSavedImageTarDir(): string {
     return `${this.getImagesDir()}/${this.getRepotagPathFriendly()}`
   }
@@ -145,7 +169,7 @@ class LayerCache {
   }
 
   genSingleLayerStorePath(id: string) {
-    return `${this.getUnpackedTarDir()}/${id}/layer.tar`
+    return `${this.getLayerCachesDir()}/${id}/layer.tar`
   }
 
   genSingleLayerStoreKey(id: string) {
