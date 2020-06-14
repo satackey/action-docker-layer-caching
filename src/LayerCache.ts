@@ -9,7 +9,8 @@ import { assertManifests, Manifest, Manifests } from './Tar'
 class LayerCache {
   repotag: string
   originalKeyToStore: string = ''
-  tarFile: string = ''
+  // tarFile: string = ''
+  imagesDir: string = 'docker_images'
   // unpackedTarDir: string = ''
   // manifests: Manifests = []
 
@@ -147,7 +148,7 @@ class LayerCache {
   // ---
 
   getImagesDir(): string {
-    return `${__dirname}/docker_images`
+    return `${__dirname}/${this.imagesDir}`
   }
 
   getUnpackedTarDir(): string {
