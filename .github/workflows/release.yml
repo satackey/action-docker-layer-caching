@@ -1,4 +1,4 @@
-name: Relase distribution
+name: Release & Test
 
 on:
   push:
