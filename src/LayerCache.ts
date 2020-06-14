@@ -30,10 +30,11 @@ class LayerCache {
   async store(key: string) {
     this.originalKeyToStore = key
     await this.saveImageAsUnpacked()
-    await this.separateAllLayerCaches()
+    // await this.separateAllLayerCaches()
     // Todo: remove await
     const storeRoot = this.storeRoot()
-    const storeLayers = this.storeLayers()
+    // const storeLayers = this.storeLayers()
+    const storeLayers = Promise.resolve()
     try {
       await Promise.all([storeRoot, storeLayers])
     } catch (e) {
@@ -116,12 +117,12 @@ class LayerCache {
       return false
     }
 
-    const hasRestoredAllLayers = await this.restoreLayers()
-    if (!hasRestoredAllLayers) {
-      core.info(`Some layer cache could not be found. aborting.`)
-      return false
-    }
-    await this.joinAllLayerCaches()
+    // const hasRestoredAllLayers = await this.restoreLayers()
+    // if (!hasRestoredAllLayers) {
+    //   core.info(`Some layer cache could not be found. aborting.`)
+    //   return false
+    // }
+    // await this.joinAllLayerCaches()
     await this.loadImageFromUnpacked()
     return true
   }
