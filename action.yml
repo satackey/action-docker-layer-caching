@@ -1,10 +1,8 @@
 name: Docker Layer Caching
 description: ''
-
 branding:
-  icon: 'layers'
-  color: 'blue'
-
+  icon: layers
+  color: blue
 inputs:
   repotag:
     description: The image repotag to be cached.
@@ -12,9 +10,7 @@ inputs:
   key:
     description: The key name to store cache.
     required: true
-
-
 runs:
   using: node12
-  main: main.ts
-  post: post.ts
+  main: dist/ttsc-dist/main.js/index.js
+  post: dist/ttsc-dist/post.js/index.js
