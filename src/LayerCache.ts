@@ -60,18 +60,18 @@ class LayerCache {
   }
 
   private async separateAllLayerCaches() {
-    await this.moveLayertars(this.getUnpackedTarDir(), this.getLayerCachesDir())
+    await this.moveLayerTars(this.getUnpackedTarDir(), this.getLayerCachesDir())
   }
 
   private async joinAllLayerCaches() {
-    await this.moveLayertars(this.getLayerCachesDir(), this.getUnpackedTarDir())
+    await this.moveLayerTars(this.getLayerCachesDir(), this.getUnpackedTarDir())
   }
 
-  private async moveLayertars(fromDir: string, toDir: string) {
+  private async moveLayerTars(fromDir: string, toDir: string) {
     const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: fromDir })).stdoutStr.split(`\n`)
     const moveLayer = async (layer: string) => {
-      const from = `${fromDir}/${layer}`
-      const to = `${toDir}/${layer}`
+      const from = path.resolve(`${fromDir}/${layer}`)
+      const to = path.resolve(`${toDir}/${layer}`)
       core.debug(`Moving layer tar from ${from} to ${to}`)
       await fs.mkdir(`${path.dirname(to)}`, { recursive: true })
       await fs.rename(from, to)
