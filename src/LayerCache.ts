@@ -10,8 +10,8 @@ class LayerCache {
   repotag: string
   originalKeyToStore: string = ''
   tarFile: string = ''
-  unpackedTarDir: string = ''
-  manifests: Manifests = []
+  // unpackedTarDir: string = ''
+  // manifests: Manifests = []
 
   constructor(repotag: string) {
     this.repotag = repotag
@@ -40,7 +40,7 @@ class LayerCache {
   }
 
   private async getManifests() {
-    const manifests = JSON.parse((await fs.readFile(`${this.unpackedTarDir}/manifest.json`)).toString())
+    const manifests = JSON.parse((await fs.readFile(`${this.getUnpackedTarDir()}/manifest.json`)).toString())
     assertManifests(manifests)
     return manifests
   }
@@ -48,7 +48,7 @@ class LayerCache {
   private async storeRoot() {
     const rootKey = this.getRootKey()
     const paths = [
-      this.unpackedTarDir,
+      this.getUnpackedTarDir(),
       ...(await this.getLayerTarFiles()).map(file => `!${file}`)
     ]
     core.info(`Start storing root cache: ${rootKey}`)
@@ -118,7 +118,7 @@ class LayerCache {
   }
 
   private async loadImageFromUnpacked() {
-    await exec.exec(`sh -c`, [`tar cf - '${this.unpackedTarDir}' | docker load`])
+    await exec.exec(`sh -c`, [`tar cf - '${this.getUnpackedTarDir()}' | docker load`])
   }
 
   // ---
@@ -144,7 +144,7 @@ class LayerCache {
   }
 
   genSingleLayerStorePath(id: string) {
-    return `${this.unpackedTarDir}/${id}/layer.tar`
+    return `${this.getUnpackedTarDir()}/${id}/layer.tar`
   }
 
   genSingleLayerStoreKey(id: string) {
