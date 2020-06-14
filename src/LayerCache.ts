@@ -77,7 +77,7 @@ class LayerCache {
   }
 
   private async moveLayerTarsInDir(fromDir: string, toDir: string) {
-    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: fromDir })).stdoutStr.split(`\n`).filter(tar => tar !== '')
+    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: fromDir, silent: true })).stdoutStr.split(`\n`).filter(tar => tar !== '')
     const moveLayer = async (layer: string) => {
       const from = path.resolve(`${fromDir}/${layer}`)
       const to = path.resolve(`${toDir}/${layer}`)
