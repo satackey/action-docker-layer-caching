@@ -64,6 +64,8 @@ jobs:
       with:
         path: './root-cache'
         key: aws-cli-docker-image-sha-${{ github.sha }}-root
+        restore-keys: |
+          aws-cli-docker-image-sha
     - run: ls ./root-cache
 
   test_restoring:
