@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  node:
+    build:
+      context: ../
+      dockerfile: ./test_project/Dockerfile
