@@ -49,7 +49,6 @@ jobs:
       with:
         repotag: amazon/aws-cli
         key: aws-cli-docker-image-sha-${{ github.sha }}
-
     - run: docker pull amazon/aws-cli
 
   test_restoring:
@@ -75,4 +74,18 @@ jobs:
         repotag: amazon/aws-cli
         key: aws-cli-docker-image-sha-${{ github.sha }}
 
+    - run: docker inspect amazon/aws-cli
+    - run: echo ::set-output name=id::$(docker image ls -q amazon/aws-cli)
+      id: cached
+
     - run: docker pull amazon/aws-cli
+
+    - run: docker inspect amazon/aws-cli
+    - run: echo ::set-output name=id::$(docker image ls -q amazon/aws-cli)
+      id: latest
+
+    - run: |
+        if [ ! ${{ steps.cached.outputs.id }} = ${{ steps.latest.outputs.id }} ];then
+          echo cached != latest
+          exit 1
+        fi
