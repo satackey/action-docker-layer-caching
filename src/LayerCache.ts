@@ -27,10 +27,10 @@ class LayerCache {
   }
 
   async store(key: string) {
-    await this.saveImageAsUnpacked()
     this.originalKeyToStore = key
-    // Todo: remove await
+    await this.saveImageAsUnpacked()
     await this.separateAllLayerCaches()
+    // Todo: remove await
     const storeRoot = await this.storeRoot()
     const storeLayers = this.storeLayers()
     await Promise.all([storeRoot, storeLayers])
@@ -100,7 +100,8 @@ class LayerCache {
 
   async restore(key: string, restoreKeys?: string[]) {
     this.originalKeyToStore = key
-    const hasRestoredRootCache = await this.restoreRoot(restoreKeys)
+    const restoreKeysIncludedRootKey = [key, ...(restoreKeys !== undefined ? restoreKeys : [])]
+    const hasRestoredRootCache = await this.restoreRoot(restoreKeysIncludedRootKey)
     if (!hasRestoredRootCache) {
       core.info(`Root cache could not be found. aborting.`)
       return false
