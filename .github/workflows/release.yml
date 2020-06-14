@@ -60,7 +60,7 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: './root-cache'
-        key: aws-cli-docker-image-sha:${{ github.sha }}
+        key: aws-cli-docker-image-sha:${{ github.sha }}-root
     - run: ls ./root-cache
 
   test_restoring:

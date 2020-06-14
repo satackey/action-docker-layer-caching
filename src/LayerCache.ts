@@ -29,7 +29,8 @@ class LayerCache {
   async store(key: string) {
     await this.saveImageAsUnpacked()
     this.originalKeyToStore = key
-    const storeRoot = this.storeRoot()
+    // Todo: remove await
+    const storeRoot = await this.storeRoot()
     const storeLayers = this.storeLayers()
     await Promise.all([storeRoot, storeLayers])
   }
