@@ -5,7 +5,6 @@ import * as cache from '@actions/cache'
 import { ExecOptions } from '@actions/exec/lib/interfaces'
 import { promises as fs } from 'fs'
 import { assertManifests, Manifest, Manifests } from './Tar'
-import { dirname } from 'path'
 
 class LayerCache {
   repotag: string
@@ -61,24 +60,20 @@ class LayerCache {
   }
 
   private async separateAllLayerCaches() {
-    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: this.getUnpackedTarDir()})).stdoutStr.split(`\n`)
-    const moveLayer = async (layer: string) => {
-      const from = `${this.getUnpackedTarDir()}/${layer}`
-      const to = `${this.getLayerCachesDir()}/${layer}`
-      core.debug(`Moving layer tar from ${from} to ${to}`)
-      await fs.mkdir(`${dirname(to)}`, { recursive: true })
-      await fs.rename(from, to)
-    }
-    await Promise.all(layerTars.map(moveLayer))
+    await this.moveLayertars(this.getUnpackedTarDir(), this.getLayerCachesDir())
   }
 
   private async joinAllLayerCaches() {
-    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: this.getLayerCachesDir()})).stdoutStr.split(`\n`)
+    await this.moveLayertars(this.getLayerCachesDir(), this.getUnpackedTarDir())
+  }
+
+  private async moveLayertars(fromDir: string, toDir: string) {
+    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: fromDir })).stdoutStr.split(`\n`)
     const moveLayer = async (layer: string) => {
-      const from = `${this.getLayerCachesDir()}/${layer}`
-      const to = `${this.getUnpackedTarDir()}/${layer}`
+      const from = `${fromDir}/${layer}`
+      const to = `${toDir}/${layer}`
       core.debug(`Moving layer tar from ${from} to ${to}`)
-      await fs.mkdir(`${dirname(to)}`, { recursive: true })
+      await fs.mkdir(`${path.dirname(to)}`, { recursive: true })
       await fs.rename(from, to)
     }
     await Promise.all(layerTars.map(moveLayer))
