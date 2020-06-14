@@ -29,7 +29,10 @@ jobs:
       with:
         push-branch: '{branch}-release'
 
-  test_saving:
+  # 
+  # test built image caching
+
+  test_saving_built:
     runs-on: ubuntu-latest
     needs:
     - build_and_push
@@ -41,6 +44,74 @@ jobs:
         echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
 
     - uses: actions/checkout@v2
+      name: Pull action
+      with:
+        ref: ${{ steps.extract.outputs.branch }}-release
+        path: action-dlc
+
+    - uses: actions/checkout@v2
+
+    - uses: ./action-dlc
+      with:
+        repotag: test_project_node
+        key: aws-cli-docker-image-sha-${{ github.sha }}
+
+    - run: docker-compose -f test_project/docker-compose.yml -p test_project build
+
+  test_restoring_built:
+    runs-on: ubuntu-latest
+    needs:
+    - test_saving_built
+
+    steps:
+    - name: Extract
+      id: extract
+      run: |
+        echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+
+    - uses: actions/checkout@v2
+      name: Pull action
+      with:
+        ref: ${{ steps.extract.outputs.branch }}-release
+        path: action-dlc
+
+    - uses: actions/checkout@v2
+
+    - uses: ./action-dlc
+      with:
+        repotag: test_project_node
+        key: aws-cli-docker-image-sha-${{ github.sha }}
+
+    - run: echo ::set-output name=id::$(docker image ls -q test_project_node)
+      id: cached
+
+    - run: docker-compose -f test_project/docker-compose.yml -p test_project build
+
+    - run: echo ::set-output name=id::$(docker image ls -q test_project_node)
+      id: latest
+
+    - run: |
+        if [ ! ${{ steps.cached.outputs.id }} = ${{ steps.latest.outputs.id }} ];then
+          echo cached != latest
+          exit 1
+        fi
+
+  # 
+  # test pulled image caching
+
+  test_saving_pulled:
+    runs-on: ubuntu-latest
+    needs:
+    - build_and_push
+
+    steps:
+    - name: Extract
+      id: extract
+      run: |
+        echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+
+    - uses: actions/checkout@v2
+      name: Pull action
       with:
         ref: ${{ steps.extract.outputs.branch }}-release
         path: action-dlc
@@ -52,20 +123,19 @@ jobs:
 
     - run: docker run --rm amazon/aws-cli --version
 
-  test_restoring:
+  test_restoring_pulled:
     runs-on: ubuntu-latest
     needs:
-    - test_saving
+    - test_saving_pulled
 
     steps:
-    - uses: actions/checkout@v2
-
     - name: Extract
       id: extract
       run: |
         echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
 
     - uses: actions/checkout@v2
+      name: Pull action
       with:
         ref: ${{ steps.extract.outputs.branch }}-release
         path: action-dlc
