@@ -37,20 +37,19 @@ class LayerCache {
   private async saveImageAsUnpacked() {
     await this.exec('mkdir -p', [this.getSavedImageTarDir()])
     await this.exec(`sh -c`, [`docker save '${this.repotag}' | tar xf - -C ${this.getSavedImageTarDir()}`])
-    this.tarFile = this.getSavedImageTarDir()
   }
 
   private async getManifests() {
     const manifests = JSON.parse((await fs.readFile(`${this.unpackedTarDir}/manifest.json`)).toString())
     assertManifests(manifests)
-    this.manifests = manifests
+    return manifests
   }
 
   private async storeRoot() {
     const rootKey = this.getRootKey()
     const paths = [
       this.unpackedTarDir,
-      ...this.getLayerTarFiles().map(file => `!${file}`)
+      ...(await this.getLayerTarFiles()).map(file => `!${file}`)
     ]
     core.info(`Start storing root cache: ${rootKey}`)
     const cacheId = await cache.saveCache(paths, rootKey)
@@ -59,7 +58,7 @@ class LayerCache {
   }
 
   private async storeLayers() {
-    const storing = this.getLayerIds().map(layerId => this.storeSingleLayerBy(layerId))
+    const storing = (await this.getLayerIds()).map(layerId => this.storeSingleLayerBy(layerId))
     const cacheIds = await Promise.all(storing)
     return cacheIds
   }
@@ -107,7 +106,7 @@ class LayerCache {
   }
 
   private async restoreLayers() {
-    const restoring = this.getLayerIds().map(layerId => this.restoreSingleLayerBy(layerId))
+    const restoring = (await this.getLayerIds()).map(layerId => this.restoreSingleLayerBy(layerId))
     const hasRestored = await Promise.all(restoring)
     const FailedToRestore = (restored: Boolean) => !restored
     return hasRestored.filter(FailedToRestore).length === 0
@@ -152,19 +151,19 @@ class LayerCache {
     return `layer-${this.originalKeyToStore}-${id}`
   }
 
-  getLayerTarFiles(): string[] {
+  async getLayerTarFiles(): Promise<string[]> {
     const getTarFilesFromManifest = (manifest: Manifest) => manifest.Layers
     const addStringArray = (tarFilesOfAManifest: string[], tarFiles: string[]) => tarFiles.concat(...tarFilesOfAManifest)
 
     // Todo: use Array#flatMap
-    const tarFilesPerManifest = this.manifests.map(getTarFilesFromManifest)
+    const tarFilesPerManifest = (await this.getManifests()).map(getTarFilesFromManifest)
     const tarFiles = tarFilesPerManifest.reduce(addStringArray, [])
     return tarFiles
   }
 
-  getLayerIds(): string[] {
+  async getLayerIds(): Promise<string[]> {
     const getIdfromLayerRelativePath = (path: string) => path.replace('/layer.tar', '')
-    return this.getLayerTarFiles().map(getIdfromLayerRelativePath)
+    return (await this.getLayerTarFiles()).map(getIdfromLayerRelativePath)
   }
 }
 
