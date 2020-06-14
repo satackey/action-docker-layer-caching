@@ -54,7 +54,7 @@ jobs:
     - uses: ./action-dlc
       with:
         repotag: test_project_node
-        key: aws-cli-docker-image-sha-${{ github.sha }}
+        key: test_project_node-docker-image-sha-${{ github.sha }}
 
     - run: docker-compose -f test_project/docker-compose.yml -p test_project build
 
@@ -80,7 +80,7 @@ jobs:
     - uses: ./action-dlc
       with:
         repotag: test_project_node
-        key: aws-cli-docker-image-sha-${{ github.sha }}
+        key: test_project_node-docker-image-sha-${{ github.sha }}
 
     - run: echo ::set-output name=id::$(docker image ls -q test_project_node)
       id: cached
