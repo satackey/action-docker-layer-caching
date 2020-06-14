@@ -97,6 +97,7 @@ class LayerCache {
   private async restoreRoot(restoreKeys?: string[]): Promise<boolean> {
     core.debug(`Trying to restore root cache ID: ${this.getRootKey()}`)
     const restoredCacheKeyMayUndefined = await cache.restoreCache([this.getUnpackedTarDir()], this.getRootKey(), restoreKeys)
+    core.debug(`restoredCacheKeyMayUndefined: ${restoredCacheKeyMayUndefined}`)
     if (restoredCacheKeyMayUndefined === undefined) {
       return false
     }
