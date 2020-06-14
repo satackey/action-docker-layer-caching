@@ -14,5 +14,6 @@ jobs:
         key: docker-compose-node-image-${{ hashFiles('yarn.lock') }}-${{ hashFiles('test_project/**') }}
 
     - run: docker image ls
+    - run: ls -al
 
     - run: docker-compose -f test_project/docker-compose.yml -p test_project build
