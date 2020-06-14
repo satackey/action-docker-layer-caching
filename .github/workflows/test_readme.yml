@@ -13,4 +13,6 @@ jobs:
         repotag: test_project_node
         key: docker-compose-node-image-${{ hashFiles('yarn.lock') }}
 
+    - run: docker image ls
+
     - run: docker-compose -f test_project/docker-compose.yml -p test_project build
