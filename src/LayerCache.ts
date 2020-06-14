@@ -144,7 +144,7 @@ class LayerCache {
   }
 
   private async loadImageFromUnpacked() {
-    await exec.exec(`sh -c`, [`tar cf - '${this.getUnpackedTarDir()}' | docker load`])
+    await exec.exec(`sh -c`, [`tar cf - . | docker load`], { cwd: this.getUnpackedTarDir() })
   }
 
   async cleanUp() {
