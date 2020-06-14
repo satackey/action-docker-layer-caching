@@ -57,6 +57,8 @@ jobs:
     - test_saving
 
     steps:
+    - uses: actions/checkout@v2
+
     - uses: actions/cache@v2
       with:
         path: './root-cache'
@@ -69,6 +71,8 @@ jobs:
     - test_saving
 
     steps:
+    - uses: actions/checkout@v2
+
     - name: Extract
       id: extract
       run: |
