@@ -10,7 +10,7 @@ class LayerCache {
   repotag: string
   originalKeyToStore: string = ''
   // tarFile: string = ''
-  imagesDir: string = 'docker_images'
+  imagesDir: string = `./.action-docker-layer-caching-docker_images`
   // unpackedTarDir: string = ''
   // manifests: Manifests = []
 
@@ -35,6 +35,7 @@ class LayerCache {
     const storeRoot = await this.storeRoot()
     // const storeLayers = this.storeLayers()
     // await Promise.all([storeRoot, storeLayers])
+    await this.cleanUp()
   }
 
   private async saveImageAsUnpacked() {
@@ -115,6 +116,7 @@ class LayerCache {
     // }
     // await this.joinAllLayerCaches()
     await this.loadImageFromUnpacked()
+    await this.cleanUp()
     return true
   }
 
@@ -145,10 +147,14 @@ class LayerCache {
     await exec.exec(`sh -c`, [`tar cf - '${this.getUnpackedTarDir()}' | docker load`])
   }
 
+  async cleanUp() {
+    await fs.rmdir(this.getImagesDir(), { recursive: true })
+  }
+
   // ---
 
   getImagesDir(): string {
-    return `${__dirname}/${this.imagesDir}`
+    return this.imagesDir
   }
 
   getUnpackedTarDir(): string {
