@@ -61,7 +61,7 @@ class LayerCache {
   }
 
   private async separateAllLayerCaches() {
-    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: this.getUnpackedTarDir()})).toString().split(`\n`)
+    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: this.getUnpackedTarDir()})).stdoutStr.split(`\n`)
     const moveLayer = async (layer: string) => {
       const from = `${this.getUnpackedTarDir()}/${layer}`
       const to = `${this.getLayerCachesDir()}/${layer}`
@@ -73,7 +73,7 @@ class LayerCache {
   }
 
   private async joinAllLayerCaches() {
-    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: this.getLayerCachesDir()})).toString().split(`\n`)
+    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: this.getLayerCachesDir()})).stdoutStr.split(`\n`)
     const moveLayer = async (layer: string) => {
       const from = `${this.getLayerCachesDir()}/${layer}`
       const to = `${this.getUnpackedTarDir()}/${layer}`
