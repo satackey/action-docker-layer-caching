@@ -38,6 +38,8 @@ jobs:
     - build_and_push
 
     steps:
+    - uses: actions/checkout@v2
+
     - name: Extract
       id: extract
       run: |
@@ -48,8 +50,6 @@ jobs:
       with:
         ref: ${{ steps.extract.outputs.branch }}-release
         path: action-dlc
-
-    - uses: actions/checkout@v2
 
     - uses: ./action-dlc
       with:
@@ -64,6 +64,8 @@ jobs:
     - test_saving_built
 
     steps:
+    - uses: actions/checkout@v2
+
     - name: Extract
       id: extract
       run: |
@@ -75,8 +77,6 @@ jobs:
         ref: ${{ steps.extract.outputs.branch }}-release
         path: action-dlc
 
-    - uses: actions/checkout@v2
-
     - uses: ./action-dlc
       with:
         repotag: test_project_node
@@ -84,9 +84,7 @@ jobs:
 
     - run: echo ::set-output name=id::$(docker image ls -q test_project_node)
       id: cached
-
     - run: docker-compose -f test_project/docker-compose.yml -p test_project build
-
     - run: echo ::set-output name=id::$(docker image ls -q test_project_node)
       id: latest
 
@@ -105,6 +103,8 @@ jobs:
     - build_and_push
 
     steps:
+    - uses: actions/checkout@v2
+
     - name: Extract
       id: extract
       run: |
