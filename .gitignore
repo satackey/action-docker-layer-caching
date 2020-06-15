@@ -1,4 +1,4 @@
 node_modules
 dist
 ts-dist
-/docker_images
+/.docker_images

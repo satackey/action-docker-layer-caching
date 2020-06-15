@@ -10,7 +10,7 @@ class LayerCache {
   repotag: string
   originalKeyToStore: string = ''
   // tarFile: string = ''
-  imagesDir: string = path.resolve(`${__dirname}/../docker_images`)
+  imagesDir: string = `.docker_images`
   // unpackedTarDir: string = ''
   // manifests: Manifests = []
 
