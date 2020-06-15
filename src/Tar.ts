@@ -2,7 +2,7 @@ import { assertType } from 'typescript-is'
 
 export interface Manifest {
   Config: string
-  RepoTags: string[]
+  RepoTags: string[] | null
   Layers: string[]
 }
 
