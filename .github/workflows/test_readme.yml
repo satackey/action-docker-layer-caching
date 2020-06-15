@@ -1,6 +1,14 @@
 name: README sample test
 
-on: push
+on:
+  push:
+    branches:
+    - '**'
+    tags:
+    - 'v0.o'
+    paths:
+    - /.github/workflow/test_readme.yml
+    
 
 jobs:
   build:
