@@ -10,7 +10,7 @@ class LayerCache {
   repotag: string
   originalKeyToStore: string = ''
   // tarFile: string = ''
-  imagesDir: string = `./.action-docker-layer-caching-docker_images`
+  imagesDir: string = `${__dirname}/../docker_images`
   // unpackedTarDir: string = ''
   // manifests: Manifests = []
 
@@ -48,7 +48,20 @@ class LayerCache {
 
   private async saveImageAsUnpacked() {
     await this.exec('mkdir -p', [this.getSavedImageTarDir()])
-    await this.exec(`sh -c`, [`docker save '${this.repotag}' | tar xf - -C ${this.getSavedImageTarDir()} && echo tar extraction has just finished`])
+    await this.exec(`sh -c`, [`docker save '${(await this.makeRepotagsDockerSaveArgReady([this.repotag])).join(`' '`)}' | tar xf - -C ${this.getSavedImageTarDir()}`])
+  }
+
+  private async makeRepotagsDockerSaveArgReady(repotags: string[]): Promise<string[]> {
+    const getMiddleIdsWithRepotag = async (id: string): Promise<string[]> => {
+      return [id, ...(await this.getAllImageIdsFrom(id))]
+    }
+    return (await Promise.all(repotags.map(getMiddleIdsWithRepotag))).flat()
+  }
+
+  private async getAllImageIdsFrom(repotag: string): Promise<string[]> {
+    const { stdoutStr: rawHistoryIds } = await this.exec(`docker history -q`, [repotag])
+    const historyIds = rawHistoryIds.split(`\n`).filter(id => id !== `<missing>` && id !== ``)
+    return historyIds
   }
 
   private async getManifests() {
