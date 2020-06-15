@@ -30,11 +30,9 @@ class LayerCache {
   async store(key: string) {
     this.originalKeyToStore = key
     await this.saveImageAsUnpacked()
-    // await this.separateAllLayerCaches()
-    // Todo: remove await
+    await this.separateAllLayerCaches()
     const storeRoot = this.storeRoot()
-    // const storeLayers = this.storeLayers()
-    const storeLayers = Promise.resolve()
+    const storeLayers = this.storeLayers()
     try {
       await Promise.all([storeRoot, storeLayers])
     } catch (e) {
@@ -74,7 +72,7 @@ class LayerCache {
     const rootKey = this.getRootKey()
     const paths = [
       this.getUnpackedTarDir(),
-      // ...(await this.getLayerTarFiles()).map(file => `!${file}`)
+      ...(await this.getLayerTarFiles()).map(file => `!${file}`)
     ]
     core.info(`Start storing root cache: ${rootKey}`)
     const cacheId = await cache.saveCache(paths, rootKey)
@@ -130,12 +128,12 @@ class LayerCache {
       return false
     }
 
-    // const hasRestoredAllLayers = await this.restoreLayers()
-    // if (!hasRestoredAllLayers) {
-    //   core.info(`Some layer cache could not be found. aborting.`)
-    //   return false
-    // }
-    // await this.joinAllLayerCaches()
+    const hasRestoredAllLayers = await this.restoreLayers()
+    if (!hasRestoredAllLayers) {
+      core.info(`Some layer cache could not be found. aborting.`)
+      return false
+    }
+    await this.joinAllLayerCaches()
     await this.loadImageFromUnpacked()
     return true
   }
