@@ -77,19 +77,25 @@ jobs:
         ref: ${{ steps.extract.outputs.branch }}-release
         path: action-dlc
 
-    - uses: ./action-dlc
-      with:
-        repotag: test_project_node
-        key: test_project_node-docker-image-sha-${{ github.sha }}
+    - name: Show cached image info
+      run: docker inspect test_project_node
 
-    - run: echo ::set-output name=id::$(docker image ls -q test_project_node)
+    - name: Get cached image ID
+      run: echo ::set-output name=id::$(docker image ls -q test_project_node)
       id: cached
+
     - run: docker-compose -f test_project/docker-compose.yml -p test_project build
-    - run: echo ::set-output name=id::$(docker image ls -q test_project_node)
+
+    - name: Show built image info
+      run: docker inspect test_project_node
+
+    - name: Show built image ID
+      run: echo ::set-output name=id::$(docker image ls -q test_project_node)
       id: latest
 
-    - run: |
-        if [ ! ${{ steps.cached.outputs.id }} = ${{ steps.latest.outputs.id }} ];then
+    - name: Compare cached ID and after build ID
+      run: |
+        if [ ! '${{ steps.cached.outputs.id }}' = '${{ steps.latest.outputs.id }}' ];then
           echo cached != latest
           exit 1
         fi
@@ -145,18 +151,25 @@ jobs:
         repotag: amazon/aws-cli
         key: aws-cli-docker-image-sha-${{ github.sha }}
 
-    - run: docker inspect amazon/aws-cli
-    - run: echo ::set-output name=id::$(docker image ls -q amazon/aws-cli)
+    - name: Show cached image info
+      run: docker inspect amazon/aws-cli
+
+    - name: Get cached image ID
+      run: echo ::set-output name=id::$(docker image ls -q amazon/aws-cli)
       id: cached
 
     - run: docker pull amazon/aws-cli
 
-    - run: docker inspect amazon/aws-cli
-    - run: echo ::set-output name=id::$(docker image ls -q amazon/aws-cli)
+    - name: Show built image info
+      run: docker inspect amazon/aws-cli
+
+    - name: Show built image ID
+      run: echo ::set-output name=id::$(docker image ls -q amazon/aws-cli)
       id: latest
 
-    - run: |
-        if [ ! ${{ steps.cached.outputs.id }} = ${{ steps.latest.outputs.id }} ];then
+    - name: Compare cached ID and after build ID
+      run: |
+        if [ ! '${{ steps.cached.outputs.id }}' = '${{ steps.latest.outputs.id }}' ];then
           echo cached != latest
           exit 1
         fi
