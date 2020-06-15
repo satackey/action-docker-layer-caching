@@ -77,6 +77,11 @@ jobs:
         ref: ${{ steps.extract.outputs.branch }}-release
         path: action-dlc
 
+    - uses: ./action-dlc
+      with:
+        repotag: test_project_node
+        key: test_project_node-docker-image-sha-${{ github.sha }}
+
     - name: Show cached image info
       run: docker inspect test_project_node
 
