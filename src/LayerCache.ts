@@ -232,10 +232,11 @@ class LayerCache {
     return `layer-${singleLayerStoreKey}`
   }
 
-  getFormattedOriginalCacheKey(hash?: string) {
-    return format(this.originalKeyThatMayUnformatted, {
-      hash: hash !== undefined ? hash : this.getIdhashesPathFriendly()
-    })
+  getFormattedOriginalCacheKey(hashThatMayBeSpecified?: string) {
+    const hash = hashThatMayBeSpecified || this.getIdhashesPathFriendly()
+    const result = format(this.originalKeyThatMayUnformatted, { hash })
+    core.debug(JSON.stringify({ log: `getFormattedOriginalCacheKey`, hash, hashThatMayBeSpecified, result }))
+    return result
   }
 
   async getLayerTarFiles(): Promise<string[]> {
