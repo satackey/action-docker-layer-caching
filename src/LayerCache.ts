@@ -35,7 +35,13 @@ class LayerCache {
       await this.separateAllLayerCaches()
     }
 
-    return await Promise.all([this.storeRoot(), ...(this.enabledParallel ? await this.storeLayers() : [])])
+    if (await this.storeRoot() === undefined) {
+      core.info(`cache key already exists, aborting.`)
+      return false
+    }
+
+    await Promise.all(this.enabledParallel ? await this.storeLayers() : [])
+    return true
   }
 
   private async saveImageAsUnpacked() {
@@ -71,7 +77,7 @@ class LayerCache {
     core.info(`Start storing root cache, key: ${rootKey}, dir: ${this.getUnpackedTarDir()}`)
     const cacheId = await LayerCache.dismissCacheAlreadyExistsError(cache.saveCache(paths, rootKey))
     core.info(`Stored root cache, key: ${rootKey}, id: ${cacheId}`)
-    return cacheId
+    return cacheId !== -1 ? cacheId : undefined
   }
 
   private async separateAllLayerCaches() {
