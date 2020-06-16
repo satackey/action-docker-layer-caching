@@ -19,9 +19,10 @@ const main = async () => {
   core.debug(JSON.stringify({ imageIdsToSave: imageDetector.getImagesShouldSave() }))
   const layerCache = new LayerCache(imageDetector.getImagesShouldSave())
 
+  layerCache.originalKeyThatMayUnformatted = primaryKey
   core.debug(JSON.stringify({ restoredKey, formattedOriginalCacheKey: layerCache.getFormattedOriginalCacheKey()}))
   if (restoredKey !== `` && restoredKey === layerCache.getFormattedOriginalCacheKey()) {
-    core.info(`Key ${restoredKey} already exists, aborting.`)
+    core.info(`Key ${restoredKey} already exists, skip storing.`)
     return
   }
   await layerCache.store(primaryKey)
