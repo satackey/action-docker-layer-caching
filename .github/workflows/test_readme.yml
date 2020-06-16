@@ -4,6 +4,8 @@ on:
   push:
     branches:
     - '**'
+    tags:
+    - v0.0
     paths:
     - .github/workflows/test_readme.yml
 jobs:
