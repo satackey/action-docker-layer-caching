@@ -34,22 +34,8 @@ class LayerCache {
     if (this.enabledParallel) {
       await this.separateAllLayerCaches()
     }
-    const working = [this.storeRoot(), ...(this.enabledParallel ? await this.storeLayers() : [])].map(dismissCacheAlreadyExistsError)
 
-    return await Promise.all(working)
-
-    async function dismissCacheAlreadyExistsError<T>(promise: Promise<T>): Promise<T> {
-      try {
-        return await promise
-      } catch (e) {
-        if (typeof e.message !== 'string' || !e.message.includes(`Cache already exists`)) {
-          throw e
-        }
-        core.info(`info: Cache already exists: ${e.toString()}`)
-        core.debug(e)
-        return await promise
-      }
-    }
+    return await Promise.all([this.storeRoot(), ...(this.enabledParallel ? await this.storeLayers() : [])])
   }
 
   private async saveImageAsUnpacked() {
@@ -109,8 +95,20 @@ class LayerCache {
   }
 
   private async storeLayers(): Promise<Promise<number>[]> {
-    const storing = (await this.getLayerIds()).map(layerId => this.storeSingleLayerBy(layerId))
+    const storing = (await this.getLayerIds()).map(layerId => dismissCacheAlreadyExistsError(this.storeSingleLayerBy(layerId)))
     return storing
+
+    async function dismissCacheAlreadyExistsError<T>(promise: Promise<T>): Promise<T> {
+      return promise.catch(async e => {
+        if (typeof e.message !== 'string' || !e.message.includes(`Cache already exists`)) {
+          core.error(`Unexpected error: ${e.toString()}`)
+          throw e
+        }
+        core.info(`info: Cache already exists: ${e.toString()}`)
+        core.debug(e)
+        return promise
+      })
+    }
   }
 
   private async storeSingleLayerBy(id: string) {
