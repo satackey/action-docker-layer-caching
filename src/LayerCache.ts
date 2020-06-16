@@ -174,7 +174,7 @@ class LayerCache {
   private async restoreLayers() {
     const restoring = (await this.getLayerIds()).map(layerId => this.restoreSingleLayerBy(layerId))
     const restoredLayerKeysThatMayContainUndefined = await Promise.all(restoring)
-    core.debug(JSON.stringify({ hasRestored: restoredLayerKeysThatMayContainUndefined }))
+    core.debug(JSON.stringify({ restoredLayerKeysThatMayContainUndefined }))
     const FailedToRestore = (restored: string | undefined) => restored === undefined
     return restoredLayerKeysThatMayContainUndefined.filter(FailedToRestore).length === 0
   }
@@ -245,7 +245,9 @@ class LayerCache {
 
   async getLayerIds(): Promise<string[]> {
     const getIdfromLayerRelativePath = (path: string) => path.replace('/layer.tar', '')
-    return (await this.getLayerTarFiles()).map(getIdfromLayerRelativePath)
+    const layerIds = (await this.getLayerTarFiles()).map(getIdfromLayerRelativePath);
+    core.debug(JSON.stringify({ log: `loadLayerTarIds`, layerIds }))
+    return layerIds
   }
 }
 
