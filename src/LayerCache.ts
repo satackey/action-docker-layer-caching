@@ -11,7 +11,7 @@ class LayerCache {
   originalKeyToStore: string = ''
   // tarFile: string = ''
   imagesDir: string = path.resolve(`${process.cwd()}/./.action-docker-layer-caching-docker_images`)
-  enabledParallel = false
+  enabledParallel = true
   // unpackedTarDir: string = ''
   // manifests: Manifests = []
 
