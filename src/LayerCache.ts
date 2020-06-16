@@ -98,8 +98,12 @@ class LayerCache {
     return await Promise.all((await this.getLayerIds()).map(layerId => this.storeSingleLayerBy(layerId)))
   }
 
-  static dismissCacheAlreadyExistsError<T>(promise: Promise<T>): Promise<T> {
-    return promise.catch(async e => {
+  static async dismissCacheAlreadyExistsError(promise: Promise<number>): Promise<number> {
+    let result = -1
+    try {
+      result = await promise
+      return result
+    } catch (e) {
       core.debug(`catch error: ${e.toString()}`)
       if (typeof e.message !== 'string' || !e.message.includes(`Cache already exists`)) {
         core.error(`Unexpected error: ${e.toString()}`)
@@ -107,8 +111,8 @@ class LayerCache {
       }
       core.info(`info: Cache already exists: ${e.toString()}`)
       core.debug(e)
-      return await promise
-    })
+      return result
+    }
   }
 
   private async storeSingleLayerBy(id: string): Promise<number> {
