@@ -6,13 +6,14 @@ branding:
   color: 'blue'
 
 inputs:
-  repotag:
-    description: The image repotag to be cached.
-    required: true
   key:
-    description: The key name to store cache.
+    description: An explicit key for restoring and saving the cache
     required: true
-
+    default: docker-layer-caching-${{ github.workflow }}-{hash}
+  restore-keys:
+    description: An ordered list of keys to use for restoring the cache if no cache hit occurred for key 
+    required: false
+    default: docker-layer-caching-${{ github.workflow }}-
 
 runs:
   using: node12
