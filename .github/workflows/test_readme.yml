@@ -19,6 +19,8 @@ jobs:
 
   cached_build:
     runs-on: ubuntu-latest
+    needs:
+    - no_cache_build
 
     steps:
     - uses: actions/checkout@v2
