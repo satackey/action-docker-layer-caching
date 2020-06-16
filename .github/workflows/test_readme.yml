@@ -4,11 +4,8 @@ on:
   push:
     branches:
     - '**'
-    tags:
-    - 'v0.0'
     paths:
-    - /.github/workflow/test_readme.yml
-
+    - .github/workflows/test_readme.yml
 jobs:
   no_cache_build:
     runs-on: ubuntu-latest
