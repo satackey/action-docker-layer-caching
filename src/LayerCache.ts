@@ -30,8 +30,8 @@ class LayerCache {
 
   async store(key: string) {
     this.originalKeyToStore = key
+    await this.saveImageAsUnpacked()
     if (this.enabledParallel) {
-      await this.saveImageAsUnpacked()
       await this.separateAllLayerCaches()
     }
     const working = [this.storeRoot(), ...(this.enabledParallel ? await this.storeLayers() : [])].map(dismissCacheAlreadyExistsError)
