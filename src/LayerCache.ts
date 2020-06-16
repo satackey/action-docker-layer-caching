@@ -11,7 +11,7 @@ import format from 'string-format'
 class LayerCache {
   // repotag: string
   ids: string[]
-  originalKeyToStore: string = ''
+  originalKeyThatMayUnformatted: string = ''
   // tarFile: string = ''
   imagesDir: string = path.resolve(`${process.cwd()}/./.action-docker-layer-caching-docker_images`)
   enabledParallel = true
@@ -33,7 +33,7 @@ class LayerCache {
   }
 
   async store(key: string) {
-    this.originalKeyToStore = key
+    this.originalKeyThatMayUnformatted = key
     // this.originalKeyToStore = format(key, {
     //   hash: this.getIdhashesPathFriendly()
     // })
@@ -141,7 +141,7 @@ class LayerCache {
   // ---
 
   async restore(key: string, restoreKeys?: string[]) {
-    this.originalKeyToStore = key
+    this.originalKeyThatMayUnformatted = key
     // const restoreKeysIncludedRootKey = [key, ...(restoreKeys !== undefined ? restoreKeys : [])]
     const restoredCacheKey = await this.restoreRoot(restoreKeys)
     if (restoredCacheKey === undefined) {
@@ -167,8 +167,8 @@ class LayerCache {
     if (restoredCacheKeyMayUndefined === undefined) {
       return undefined
     }
-    this.originalKeyToStore = restoredCacheKeyMayUndefined.replace(/-root$/, '')
-    return this.originalKeyToStore
+    this.originalKeyThatMayUnformatted = restoredCacheKeyMayUndefined.replace(/-root$/, '')
+    return this.originalKeyThatMayUnformatted
   }
 
   private async restoreLayers() {
@@ -214,7 +214,7 @@ class LayerCache {
   }
 
   getRootKey(): string {
-    return `${this.originalKeyToStore}-root`
+    return `${this.getFormattedOriginalCacheKey()}-root`
   }
 
   genSingleLayerStorePath(id: string) {
@@ -222,7 +222,13 @@ class LayerCache {
   }
 
   genSingleLayerStoreKey(id: string) {
-    return `layer-${this.originalKeyToStore}-${id}`
+    return `layer-${this.getFormattedOriginalCacheKey()}-${id}`
+  }
+
+  getFormattedOriginalCacheKey() {
+    return format(this.originalKeyThatMayUnformatted, {
+      hash: this.getIdhashesPathFriendly()
+    })
   }
 
   async getLayerTarFiles(): Promise<string[]> {
