@@ -72,9 +72,8 @@ class LayerCache {
     const rootKey = this.getRootKey()
     const paths = [
       this.getUnpackedTarDir(),
-      // ...(await this.getLayerTarFiles()).map(file => `!${file}`)
     ]
-    core.info(`Start storing root cache, key: ${rootKey}, dir: ${this.getUnpackedTarDir()}`)
+    core.info(`Start storing root cache, key: ${rootKey}, dir: ${paths}`)
     const cacheId = await LayerCache.dismissCacheAlreadyExistsError(cache.saveCache(paths, rootKey))
     core.info(`Stored root cache, key: ${rootKey}, id: ${cacheId}`)
     return cacheId !== -1 ? cacheId : undefined
