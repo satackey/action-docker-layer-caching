@@ -52,7 +52,7 @@ class LayerCache {
   }
 
   private async saveImageAsUnpacked() {
-    await this.exec('mkdir -p', [this.getSavedImageTarDir()])
+    await this.exec('mkdir -p', [this.getSavedImageTarDir()], { silent: true })
     await this.exec(`sh -c`, [`docker save '${(await this.makeRepotagsDockerSaveArgReady(this.ids)).join(`' '`)}' | tar xf - -C ${this.getSavedImageTarDir()}`])
   }
 
@@ -64,7 +64,7 @@ class LayerCache {
   }
 
   private async getAllImageIdsFrom(repotag: string): Promise<string[]> {
-    const { stdoutStr: rawHistoryIds } = await this.exec(`docker history -q`, [repotag])
+    const { stdoutStr: rawHistoryIds } = await this.exec(`docker history -q`, [repotag], { silent: true })
     const historyIds = rawHistoryIds.split(`\n`).filter(id => id !== `<missing>` && id !== ``)
     return historyIds
   }
