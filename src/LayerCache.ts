@@ -95,7 +95,7 @@ class LayerCache {
   }
 
   private async storeLayers(): Promise<number[]> {
-    return await Promise.all(await this.getLayerIds()).map(layerId => this.storeSingleLayerBy(layerId))
+    return await Promise.all((await this.getLayerIds()).map(layerId => this.storeSingleLayerBy(layerId)))
   }
 
   static dismissCacheAlreadyExistsError<T>(promise: Promise<T>): Promise<T> {
