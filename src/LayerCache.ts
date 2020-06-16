@@ -210,7 +210,8 @@ class LayerCache {
   }
 
   getIdhashesPathFriendly(): string {
-    return crypto.createHash(`sha256`).update(this.ids.join(`-`), `utf8`).digest(`hex`)
+    return ''
+    // return crypto.createHash(`sha256`).update(this.ids.join(`-`), `utf8`).digest(`hex`)
   }
 
   getRootKey(): string {
