@@ -11,7 +11,7 @@ class LayerCache {
   originalKeyToStore: string = ''
   // tarFile: string = ''
   imagesDir: string = path.resolve(`${process.cwd()}/./.action-docker-layer-caching-docker_images`)
-  enabledParallel = true
+  enabledParallel = false
   // unpackedTarDir: string = ''
   // manifests: Manifests = []
 
@@ -138,8 +138,8 @@ class LayerCache {
         core.info(`Some layer cache could not be found. aborting.`)
         return false
       }
+      await this.joinAllLayerCaches()
     }
-    await this.joinAllLayerCaches()
     await this.loadImageFromUnpacked()
     return true
   }
