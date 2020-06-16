@@ -80,9 +80,9 @@ class LayerCache {
     const rootKey = this.getRootKey()
     const paths = [
       this.getUnpackedTarDir(),
-      ...(await this.getLayerTarFiles()).map(file => `!${file}`)
+      // ...(await this.getLayerTarFiles()).map(file => `!${file}`)
     ]
-    core.info(`Start storing root cache: ${rootKey}`)
+    core.info(`Start storing root cache, key: ${rootKey}, dir: ${this.getUnpackedTarDir()}`)
     const cacheId = await cache.saveCache(paths, rootKey)
     core.info(`Stored root cache, key: ${rootKey}, id: ${cacheId}`)
     return cacheId
@@ -128,8 +128,8 @@ class LayerCache {
 
   async restore(key: string, restoreKeys?: string[]) {
     this.originalKeyToStore = key
-    const restoreKeysIncludedRootKey = [key, ...(restoreKeys !== undefined ? restoreKeys : [])]
-    const hasRestoredRootCache = await this.restoreRoot(restoreKeysIncludedRootKey)
+    // const restoreKeysIncludedRootKey = [key, ...(restoreKeys !== undefined ? restoreKeys : [])]
+    const hasRestoredRootCache = await this.restoreRoot(restoreKeys)
     if (!hasRestoredRootCache) {
       core.info(`Root cache could not be found. aborting.`)
       return false
@@ -147,7 +147,7 @@ class LayerCache {
   }
 
   private async restoreRoot(restoreKeys?: string[]): Promise<boolean> {
-    core.debug(`Trying to restore root cache ID: ${this.getRootKey()}`)
+    core.debug(`Trying to restore root cache, ID: ${this.getRootKey()}, dir: ${this.getUnpackedTarDir()}`)
     const restoredCacheKeyMayUndefined = await cache.restoreCache([this.getUnpackedTarDir()], this.getRootKey(), restoreKeys)
     core.debug(`restoredCacheKeyMayUndefined: ${restoredCacheKeyMayUndefined}`)
     if (restoredCacheKeyMayUndefined === undefined) {
