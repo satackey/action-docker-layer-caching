@@ -1,22 +1,22 @@
 import exec from 'actions-exec-listener'
 
 export class ImageDetector {
-  alreadyExistedImages: Set<string> = new Set()
-  existingImages: Set<string> = new Set()
+  alreadyExistedImages: Set<string> = new Set([])
+  existingImages: Set<string> = new Set([])
   registerAlreadyExistedImages(images: string[]) {
-    images.forEach(this.alreadyExistedImages.add)
+    images.forEach(image => this.alreadyExistedImages.add(image))
   }
 
   async getExistingImages(): Promise<string[]> {
     const ids = (await exec.exec(`docker image ls -q`, [], { silent: true })).stdoutStr.split(`\n`).filter(id => id !== ``)
     const repotags = (await exec.exec(`sh -c "docker image ls --all --format '{{ .Repository }}:{{ .Tag }}'"`, [], { silent: false })).stdoutStr.split(`\n`).filter(id => id !== `` || !id.includes(`<node>`));
-    ([...ids, ...repotags]).forEach(this.existingImages.add)
+    ([...ids, ...repotags]).forEach(image => this.existingImages.add(image))
     return Array.from(this.existingImages)
   }
 
   getImagesShouldSave(): string[] {
     const resultSet = new Set(this.existingImages.values())
-    this.alreadyExistedImages.forEach(resultSet.delete)
+    this.alreadyExistedImages.forEach(image => resultSet.delete(image))
     return Array.from(resultSet)
   }
 }
