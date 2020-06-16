@@ -12,9 +12,5 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: satackey/action-docker-layer-caching@v0.0
-      with:
-        repotag: test_project_node
-        key: docker-compose-node-image-${{ hashFiles('yarn.lock') }}
-
-    - run: docker-compose -f test_project/docker-compose.yml -p test_project build
+    - run: docker-compose build
 ```
