@@ -10,6 +10,7 @@ const main = async () => {
   const imageIdsToSave = new Set([...currentImageIds])
   alreadyExistingImageIds.forEach(id => imageIdsToSave.delete(id))
 
+  core.debug(JSON.stringify({ imageIdsToSave }))
   const layerCache = new LayerCache(Array.from(imageIdsToSave))
 
   core.debug(JSON.stringify({ restoredKey, formattedOriginalCacheKey: layerCache.getFormattedOriginalCacheKey()}))
