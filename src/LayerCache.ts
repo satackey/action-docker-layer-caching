@@ -136,32 +136,32 @@ class LayerCache {
   async restore(key: string, restoreKeys?: string[]) {
     this.originalKeyToStore = key
     // const restoreKeysIncludedRootKey = [key, ...(restoreKeys !== undefined ? restoreKeys : [])]
-    const hasRestoredRootCache = await this.restoreRoot(restoreKeys)
-    if (!hasRestoredRootCache) {
+    const restoredCacheKey = await this.restoreRoot(restoreKeys)
+    if (restoredCacheKey === undefined) {
       core.info(`Root cache could not be found. aborting.`)
-      return false
+      return undefined
     }
     if (this.enabledParallel) {
       const hasRestoredAllLayers = await this.restoreLayers()
       if (!hasRestoredAllLayers) {
         core.info(`Some layer cache could not be found. aborting.`)
-        return false
+        return undefined
       }
       await this.joinAllLayerCaches()
     }
     await this.loadImageFromUnpacked()
-    return true
+    return restoredCacheKey
   }
 
-  private async restoreRoot(restoreKeys?: string[]): Promise<boolean> {
+  private async restoreRoot(restoreKeys?: string[]): Promise<string | undefined> {
     core.debug(`Trying to restore root cache, ID: ${this.getRootKey()}, dir: ${this.getUnpackedTarDir()}`)
     const restoredCacheKeyMayUndefined = await cache.restoreCache([this.getUnpackedTarDir()], this.getRootKey(), restoreKeys)
     core.debug(`restoredCacheKeyMayUndefined: ${restoredCacheKeyMayUndefined}`)
     if (restoredCacheKeyMayUndefined === undefined) {
-      return false
+      return undefined
     }
     this.originalKeyToStore = restoredCacheKeyMayUndefined.replace(/-root$/, '')
-    return true
+    return this.originalKeyToStore
   }
 
   private async restoreLayers() {
