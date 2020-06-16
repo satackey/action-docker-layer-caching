@@ -11,6 +11,7 @@ class LayerCache {
   originalKeyToStore: string = ''
   // tarFile: string = ''
   imagesDir: string = path.resolve(`${process.cwd()}/./.action-docker-layer-caching-docker_images`)
+  enabledParallel = true
   // unpackedTarDir: string = ''
   // manifests: Manifests = []
 
@@ -29,9 +30,11 @@ class LayerCache {
 
   async store(key: string) {
     this.originalKeyToStore = key
-    await this.saveImageAsUnpacked()
-    await this.separateAllLayerCaches()
-    const working = [this.storeRoot(), ...(await this.storeLayers())].map(dismissCacheAlreadyExistsError)
+    if (this.enabledParallel) {
+      await this.saveImageAsUnpacked()
+      await this.separateAllLayerCaches()
+    }
+    const working = [this.storeRoot(), ...(this.enabledParallel ? await this.storeLayers() : [])].map(dismissCacheAlreadyExistsError)
 
     return await Promise.all(working)
 
@@ -131,11 +134,12 @@ class LayerCache {
       core.info(`Root cache could not be found. aborting.`)
       return false
     }
-
-    const hasRestoredAllLayers = await this.restoreLayers()
-    if (!hasRestoredAllLayers) {
-      core.info(`Some layer cache could not be found. aborting.`)
-      return false
+    if (this.enabledParallel) {
+      const hasRestoredAllLayers = await this.restoreLayers()
+      if (!hasRestoredAllLayers) {
+        core.info(`Some layer cache could not be found. aborting.`)
+        return false
+      }
     }
     await this.joinAllLayerCaches()
     await this.loadImageFromUnpacked()
