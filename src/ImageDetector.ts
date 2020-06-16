@@ -10,7 +10,7 @@ export class ImageDetector {
 
   async getExistingImages(): Promise<string[]> {
     const ids = (await exec.exec(`docker image ls -q`, [], { silent: true })).stdoutStr.split(`\n`).filter(id => id !== ``)
-    const repotags = (await exec.exec(`sh -c "docker image ls --all --format '{{ .Repository }}:{{ .Tag }}'"`, [], { silent: false })).stdoutStr.split(`\n`).filter(id => id !== `` || !id.includes(`<node>`));
+    const repotags = (await exec.exec(`sh -c "docker image ls --all --format '{{ .Repository }}:{{ .Tag }}'"`, [], { silent: false })).stdoutStr.split(`\n`).filter(id => id !== `` || !id.includes(`<none>`));
     ([...ids, ...repotags]).forEach(image => this.existingImages.add(image))
     core.debug(JSON.stringify({ existingImages: this.existingImages }))
     return Array.from(this.existingImages)
