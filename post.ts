@@ -15,7 +15,7 @@ const main = async () => {
 
   const imageDetector = new ImageDetector()
   imageDetector.registerAlreadyExistedImages(alreadyExistingImages)
-  imageDetector.getExistingImages()
+  await imageDetector.getExistingImages()
   core.debug(JSON.stringify({ imageIdsToSave: imageDetector.getImagesShouldSave() }))
   const layerCache = new LayerCache(imageDetector.getImagesShouldSave())
 
