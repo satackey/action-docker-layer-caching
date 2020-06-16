@@ -69,7 +69,7 @@ class LayerCache {
       // ...(await this.getLayerTarFiles()).map(file => `!${file}`)
     ]
     core.info(`Start storing root cache, key: ${rootKey}, dir: ${this.getUnpackedTarDir()}`)
-    const cacheId = await cache.saveCache(paths, rootKey)
+    const cacheId = await LayerCache.dismissCacheAlreadyExistsError(cache.saveCache(paths, rootKey))
     core.info(`Stored root cache, key: ${rootKey}, id: ${cacheId}`)
     return cacheId
   }
@@ -95,20 +95,20 @@ class LayerCache {
   }
 
   private async storeLayers(): Promise<Promise<number>[]> {
-    const storing = (await this.getLayerIds()).map(layerId => dismissCacheAlreadyExistsError(this.storeSingleLayerBy(layerId)))
+    const storing = (await this.getLayerIds()).map(layerId => LayerCache.dismissCacheAlreadyExistsError(this.storeSingleLayerBy(layerId)))
     return storing
+  }
 
-    async function dismissCacheAlreadyExistsError<T>(promise: Promise<T>): Promise<T> {
-      return promise.catch(async e => {
-        if (typeof e.message !== 'string' || !e.message.includes(`Cache already exists`)) {
-          core.error(`Unexpected error: ${e.toString()}`)
-          throw e
-        }
-        core.info(`info: Cache already exists: ${e.toString()}`)
-        core.debug(e)
-        return promise
-      })
-    }
+  static dismissCacheAlreadyExistsError<T>(promise: Promise<T>): Promise<T> {
+    return promise.catch(async e => {
+      if (typeof e.message !== 'string' || !e.message.includes(`Cache already exists`)) {
+        core.error(`Unexpected error: ${e.toString()}`)
+        throw e
+      }
+      core.info(`info: Cache already exists: ${e.toString()}`)
+      core.debug(e)
+      return promise
+    })
   }
 
   private async storeSingleLayerBy(id: string) {
