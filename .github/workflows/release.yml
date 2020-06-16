@@ -52,6 +52,7 @@ jobs:
         path: action-dlc
 
     - uses: ./action-dlc
+      name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
       with:
         repotag: test_project_node
         key: docker-layer-caching-test_project_node-sha:${{ github.sha }}
@@ -78,6 +79,7 @@ jobs:
         path: action-dlc
 
     - uses: ./action-dlc
+      name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
       with:
         repotag: test_project_node
         key: docker-layer-caching-test_project_node-sha:${{ github.sha }}
@@ -128,6 +130,7 @@ jobs:
         path: action-dlc
 
     - uses: ./action-dlc
+      name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
       with:
         repotag: amazon/aws-cli
         key: docker-layer-caching-aws-cli-sha:${{ github.sha }}
@@ -152,6 +155,7 @@ jobs:
         path: action-dlc
 
     - uses: ./action-dlc
+      name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
       with:
         repotag: amazon/aws-cli
         key: docker-layer-caching-aws-cli-sha:${{ github.sha }}
