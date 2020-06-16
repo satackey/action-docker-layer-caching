@@ -2,16 +2,22 @@ import * as core from '@actions/core'
 import exec from 'actions-exec-listener'
 
 import { LayerCache } from './src/LayerCache'
+import { ImageDetector } from './src/ImageDetector'
+import { assertType } from 'typescript-is'
 const main = async () => {
   const primaryKey = core.getInput('key', { required: true })
   const restoredKey = JSON.parse(core.getState(`restored-key`)) as string
-  const alreadyExistingImageIds = JSON.parse(core.getState(`already-existing-image-ids`)) as string[]
-  const currentImageIds = (await exec.exec(`docker image ls -q`)).stdoutStr.split(`\n`).filter(id => id !== ``)
-  const imageIdsToSave = new Set([...currentImageIds])
-  alreadyExistingImageIds.forEach(id => imageIdsToSave.delete(id))
 
-  core.debug(JSON.stringify({ imageIdsToSave }))
-  const layerCache = new LayerCache(Array.from(imageIdsToSave))
+  const rawAlreadyExistingImages = core.getState(`already-existing-images`)
+  assertType<string>(rawAlreadyExistingImages)
+  const alreadyExistingImages = JSON.parse(rawAlreadyExistingImages)
+  assertType<string[]>(alreadyExistingImages)
+
+  const imageDetector = new ImageDetector()
+  imageDetector.registerAlreadyExistedImages(alreadyExistingImages)
+  imageDetector.getExistingImages()
+  core.debug(JSON.stringify({ imageIdsToSave: imageDetector.getImagesShouldSave() }))
+  const layerCache = new LayerCache(imageDetector.getImagesShouldSave())
 
   core.debug(JSON.stringify({ restoredKey, formattedOriginalCacheKey: layerCache.getFormattedOriginalCacheKey()}))
   if (restoredKey !== `` && restoredKey === layerCache.getFormattedOriginalCacheKey()) {

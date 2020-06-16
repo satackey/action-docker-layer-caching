@@ -1,13 +1,14 @@
 import * as core from '@actions/core'
 import exec from 'actions-exec-listener'
 import { LayerCache } from './src/LayerCache'
+import {  ImageDetector } from './src/ImageDetector'
 
 const main = async () => {
   // const repotag = core.getInput(`repotag`, { required: true })
   const primaryKey = core.getInput(`key`, { required: true })
   const restoreKeys = core.getInput(`restore-keys`, { required: false }).split(`\n`).filter(key => key !== ``)
 
-  core.saveState(`already-existing-image-ids`, (await exec.exec(`docker image ls -q`)).stdoutStr.split(`\n`).filter(id => id !== ``))
+  core.saveState(`already-existing-images`, JSON.stringify(await new ImageDetector().getExistingImages()))
 
   const layerCache = new LayerCache([])
   const restoredKey = await layerCache.restore(primaryKey, restoreKeys)
