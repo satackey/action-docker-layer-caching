@@ -1,13 +1,16 @@
 import * as path from 'path'
 import exec from 'actions-exec-listener'
+import crypto from 'crypto'
 import * as core from '@actions/core'
 import * as cache from '@actions/cache'
 import { ExecOptions } from '@actions/exec/lib/interfaces'
 import { promises as fs } from 'fs'
 import { assertManifests, Manifest, Manifests } from './Tar'
+import format from 'string-format'
 
 class LayerCache {
-  repotag: string
+  // repotag: string
+  ids: string[]
   originalKeyToStore: string = ''
   // tarFile: string = ''
   imagesDir: string = path.resolve(`${process.cwd()}/./.action-docker-layer-caching-docker_images`)
@@ -15,8 +18,9 @@ class LayerCache {
   // unpackedTarDir: string = ''
   // manifests: Manifests = []
 
-  constructor(repotag: string) {
-    this.repotag = repotag
+  constructor(ids: string[]) {
+    // this.repotag = repotag
+    this.ids = ids
   }
 
   async exec(command: string, args?: string[], options?: ExecOptions) {
@@ -30,6 +34,9 @@ class LayerCache {
 
   async store(key: string) {
     this.originalKeyToStore = key
+    // this.originalKeyToStore = format(key, {
+    //   hash: this.getIdhashesPathFriendly()
+    // })
     await this.saveImageAsUnpacked()
     if (this.enabledParallel) {
       await this.separateAllLayerCaches()
@@ -46,7 +53,7 @@ class LayerCache {
 
   private async saveImageAsUnpacked() {
     await this.exec('mkdir -p', [this.getSavedImageTarDir()])
-    await this.exec(`sh -c`, [`docker save '${(await this.makeRepotagsDockerSaveArgReady([this.repotag])).join(`' '`)}' | tar xf - -C ${this.getSavedImageTarDir()}`])
+    await this.exec(`sh -c`, [`docker save '${(await this.makeRepotagsDockerSaveArgReady(this.ids)).join(`' '`)}' | tar xf - -C ${this.getSavedImageTarDir()}`])
   }
 
   private async makeRepotagsDockerSaveArgReady(repotags: string[]): Promise<string[]> {
@@ -191,7 +198,7 @@ class LayerCache {
   }
 
   getUnpackedTarDir(): string {
-    return `${this.getImagesDir()}/${this.getRepotagPathFriendly()}`
+    return `${this.getImagesDir()}/${this.getIdhashesPathFriendly()}`
   }
 
   getLayerCachesDir() {
@@ -199,11 +206,11 @@ class LayerCache {
   }
 
   getSavedImageTarDir(): string {
-    return `${this.getImagesDir()}/${this.getRepotagPathFriendly()}`
+    return `${this.getImagesDir()}/${this.getIdhashesPathFriendly()}`
   }
 
-  getRepotagPathFriendly(): string {
-    return this.repotag.replace('/', '-') 
+  getIdhashesPathFriendly(): string {
+    return crypto.createHash(`sha256`).update(this.ids.join(`-`), `utf8`).digest(`hex`)
   }
 
   getRootKey(): string {

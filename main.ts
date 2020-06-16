@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-
+import exec from 'actions-exec-listener'
 import { LayerCache } from './src/LayerCache'
 
 const main = async () => {
@@ -7,7 +7,9 @@ const main = async () => {
   const primaryKey = core.getInput(`key`, { required: true })
   const restoreKeys = core.getInput(`restore-keys`, { required: false }).split(`\n`).filter(key => key !== ``)
 
-  const layerCache = new LayerCache(repotag)
+  core.saveState(`already-existing-image-ids`, (await exec.exec(`docker image ls -q`)).stdoutStr.split(`\n`).filter(id => id !== ``))
+
+  const layerCache = new LayerCache([repotag])
   const restoredKey = await layerCache.restore(primaryKey, restoreKeys)
   await layerCache.cleanUp()
 

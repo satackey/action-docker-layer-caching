@@ -9,10 +9,13 @@
     "@actions/cache": "^0.2.1",
     "@actions/core": "^1.2.4",
     "actions-exec-listener": "^0.0.1",
+    "crypto": "^1.0.1",
+    "string-format": "^2.0.0",
     "typescript-is": "^0.16.2"
   },
   "devDependencies": {
     "@types/node": "^14.0.11",
+    "@types/string-format": "^2.0.0",
     "@zeit/ncc": "^0.22.3",
     "ts-node": "^8.10.2",
     "ttypescript": "^1.5.10",
