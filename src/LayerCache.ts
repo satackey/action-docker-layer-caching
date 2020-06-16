@@ -198,7 +198,7 @@ class LayerCache {
   }
 
   getUnpackedTarDir(): string {
-    return `${this.getImagesDir()}/${this.getIdhashesPathFriendly()}`
+    return path.resolve(`${this.getImagesDir()}/${this.getCurrentTarStoreDir()}`)
   }
 
   getLayerCachesDir() {
@@ -206,12 +206,15 @@ class LayerCache {
   }
 
   getSavedImageTarDir(): string {
-    return `${this.getImagesDir()}/${this.getIdhashesPathFriendly()}`
+    return path.resolve(`${this.getImagesDir()}/${this.getCurrentTarStoreDir()}`)
+  }
+
+  getCurrentTarStoreDir(): string {
+    return 'image'
   }
 
   getIdhashesPathFriendly(): string {
-    return ''
-    // return crypto.createHash(`sha256`).update(this.ids.join(`-`), `utf8`).digest(`hex`)
+    return crypto.createHash(`sha256`).update(this.ids.join(`-`), `utf8`).digest(`hex`)
   }
 
   getRootKey(): string {
