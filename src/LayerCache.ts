@@ -37,14 +37,13 @@ class LayerCache {
 
     async function dismissCacheAlreadyExistsError<T>(promise: Promise<T>): Promise<T> {
       try {
-        await promise
+        return await promise
       } catch (e) {
         if (typeof e.message !== 'string' || !e.message.includes(`Cache already exists`)) {
           throw e
         }
-        core.info(`Cache already exists: ${e.toString()}`)
+        core.info(`info: Cache already exists: ${e.toString()}`)
         core.debug(e)
-      } finally {
         return await promise
       }
     }
