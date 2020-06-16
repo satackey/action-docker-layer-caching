@@ -226,12 +226,12 @@ class LayerCache {
   }
 
   genSingleLayerStoreKey(id: string) {
-    return `layer-${this.getFormattedOriginalCacheKey()}-${id}`
+    return `layer-${this.getFormattedOriginalCacheKey(id)}`
   }
 
-  getFormattedOriginalCacheKey() {
+  getFormattedOriginalCacheKey(hash?: string) {
     return format(this.originalKeyThatMayUnformatted, {
-      hash: this.getIdhashesPathFriendly()
+      hash: hash !== undefined ? hash : this.getIdhashesPathFriendly()
     })
   }
 
