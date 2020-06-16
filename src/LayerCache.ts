@@ -10,7 +10,7 @@ class LayerCache {
   repotag: string
   originalKeyToStore: string = ''
   // tarFile: string = ''
-  imagesDir: string = `.action-docker-layer-caching-docker_images`
+  imagesDir: string = path.resolve(`${process.cwd()}/./.action-docker-layer-caching-docker_images`)
   // unpackedTarDir: string = ''
   // manifests: Manifests = []
 
