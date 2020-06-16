@@ -10,7 +10,7 @@ class LayerCache {
   repotag: string
   originalKeyToStore: string = ''
   // tarFile: string = ''
-  imagesDir: string = `.docker_images`
+  imagesDir: string = `.action-docker-layer-caching-docker_images`
   // unpackedTarDir: string = ''
   // manifests: Manifests = []
 
@@ -31,16 +31,22 @@ class LayerCache {
     this.originalKeyToStore = key
     await this.saveImageAsUnpacked()
     await this.separateAllLayerCaches()
-    const storeRoot = this.storeRoot()
-    const storeLayers = this.storeLayers()
-    try {
-      await Promise.all([storeRoot, storeLayers])
-    } catch (e) {
-      if (typeof e.message !== 'string' || !e.message.includes(`Cache already exists`)) {
-        throw e
+    const working = [this.storeRoot(), ...(await this.storeLayers())].map(dismissCacheAlreadyExistsError)
+
+    return await Promise.all(working)
+
+    async function dismissCacheAlreadyExistsError<T>(promise: Promise<T>): Promise<T> {
+      try {
+        await promise
+      } catch (e) {
+        if (typeof e.message !== 'string' || !e.message.includes(`Cache already exists`)) {
+          throw e
+        }
+        core.info(`Cache already exists: ${e.toString()}`)
+        core.debug(e)
+      } finally {
+        return await promise
       }
-      core.info(`Cache already exists, key: ${this.getRootKey()}`)
-      core.debug(e)
     }
   }
 
@@ -100,10 +106,9 @@ class LayerCache {
     await Promise.all(layerTars.map(moveLayer))
   }
 
-  private async storeLayers() {
+  private async storeLayers(): Promise<Promise<number>[]> {
     const storing = (await this.getLayerIds()).map(layerId => this.storeSingleLayerBy(layerId))
-    const cacheIds = await Promise.all(storing)
-    return cacheIds
+    return storing
   }
 
   private async storeSingleLayerBy(id: string) {
