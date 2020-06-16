@@ -227,7 +227,9 @@ class LayerCache {
   }
 
   genSingleLayerStoreKey(id: string) {
-    return `layer-${this.getFormattedOriginalCacheKey(id)}`
+    const singleLayerStoreKey = this.getFormattedOriginalCacheKey(id)
+    core.debug(JSON.stringify({ log: `genSingleLayerStoreKey`, singleLayerStoreKey, id }))
+    return `layer-${singleLayerStoreKey}`
   }
 
   getFormattedOriginalCacheKey(hash?: string) {
