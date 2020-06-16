@@ -173,14 +173,14 @@ class LayerCache {
 
   private async restoreLayers() {
     const restoring = (await this.getLayerIds()).map(layerId => this.restoreSingleLayerBy(layerId))
-    const hasRestored = await Promise.all(restoring)
-    const FailedToRestore = (restored: Boolean) => !restored
-    return hasRestored.filter(FailedToRestore).length === 0
+    const restoredLayerKeysThatMayContainUndefined = await Promise.all(restoring)
+    core.debug(JSON.stringify({ hasRestored: restoredLayerKeysThatMayContainUndefined }))
+    const FailedToRestore = (restored: string | undefined) => restored === undefined
+    return restoredLayerKeysThatMayContainUndefined.filter(FailedToRestore).length === 0
   }
 
-  private async restoreSingleLayerBy(id: string): Promise<boolean> {
-    const restoredCacheKeyMayUndefined = await cache.restoreCache([this.genSingleLayerStorePath(id)], this.genSingleLayerStoreKey(id))
-    return typeof restoredCacheKeyMayUndefined === `string`
+  private async restoreSingleLayerBy(id: string): Promise<string | undefined> {
+    return await cache.restoreCache([this.genSingleLayerStorePath(id)], this.genSingleLayerStoreKey(id))
   }
 
   private async loadImageFromUnpacked() {
