@@ -209,11 +209,9 @@ class LayerCache {
 
   async getLayerTarFiles(): Promise<string[]> {
     const getTarFilesFromManifest = (manifest: Manifest) => manifest.Layers
-    const addStringArray = (tarFilesOfAManifest: string[], tarFiles: string[]) => tarFiles.concat(...tarFilesOfAManifest)
 
-    // Todo: use Array#flatMap
-    const tarFilesPerManifest = (await this.getManifests()).map(getTarFilesFromManifest)
-    const tarFiles = tarFilesPerManifest.reduce(addStringArray, [])
+    const tarFilesThatMayDuplicate = (await this.getManifests()).flatMap(getTarFilesFromManifest)
+    const tarFiles = [...new Set(tarFilesThatMayDuplicate)]
     return tarFiles
   }
 
