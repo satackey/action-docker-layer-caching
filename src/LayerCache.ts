@@ -250,7 +250,7 @@ class LayerCache {
   async getLayerIds(): Promise<string[]> {
     const getIdfromLayerRelativePath = (path: string) => path.replace('/layer.tar', '')
     const layerIds = (await this.getLayerTarFiles()).map(getIdfromLayerRelativePath);
-    core.debug(JSON.stringify({ log: `loadLayerTarIds`, layerIds }))
+    core.debug(JSON.stringify({ log: `getLayerIds`, layerIds }))
     return layerIds
   }
 }
