@@ -215,7 +215,9 @@ class LayerCache {
   }
 
   getIdhashesPathFriendly(): string {
-    return crypto.createHash(`sha256`).update(this.ids.join(`-`), `utf8`).digest(`hex`)
+    const result = crypto.createHash(`sha256`).update(this.ids.join(`-`), `utf8`).digest(`hex`)
+    core.debug(JSON.stringify({ log: `getIdhashesPathFriendly`, result }))
+    return result
   }
 
   getRootKey(): string {
@@ -233,7 +235,7 @@ class LayerCache {
   }
 
   getFormattedOriginalCacheKey(hashThatMayBeSpecified?: string) {
-    const hash = hashThatMayBeSpecified || this.getIdhashesPathFriendly()
+    const hash = hashThatMayBeSpecified !== undefined ? hashThatMayBeSpecified : this.getIdhashesPathFriendly()
     const result = format(this.originalKeyThatMayUnformatted, { hash })
     core.debug(JSON.stringify({ log: `getFormattedOriginalCacheKey`, hash, hashThatMayBeSpecified, result }))
     return result
