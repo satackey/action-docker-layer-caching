@@ -1,9 +1,9 @@
 name: Docker Layer Caching
-description: ''
+description: Cache images created between main run and post run
 
 branding:
-  icon: 'layers'
-  color: 'blue'
+  icon: layers
+  color: blue
 
 inputs:
   key:
