@@ -1,7 +1,9 @@
-# action-docker-layer-caching [![README sample test](https://github.com/satackey/action-docker-layer-caching/workflows/README%20sample%20test/badge.svg?event=push)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3A%22README+sample+test%22) [![Release & Test](https://github.com/satackey/action-docker-layer-caching/workflows/Release%20&%20Test/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3A%22Release+%26+Test%22)
+# action-docker-layer-caching [![Readme Test](https://github.com/satackey/action-docker-layer-caching/workflows/Readme%20Test/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3A%22Readme+Test%22) [![CI](https://github.com/satackey/action-docker-layer-caching/workflows/CI/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3ACI)
+
+Enable docker layer caching by adding a single line.
 
 ```yaml
-name: CI
+name: Readme Test
 
 on: push
 
@@ -11,6 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: satackey/action-docker-layer-caching@v0.0
+    - uses: satackey/action-docker-layer-caching@v0.0 # Images created after this action is called are cached.
     - run: docker-compose build
 ```
