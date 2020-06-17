@@ -39,6 +39,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - run: docker-compose -f test_project/docker-compose.yml -p test_project pull
 
     - name: Extract
       id: extract
@@ -66,6 +67,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - run: docker-compose -f test_project/docker-compose.yml -p test_project pull
 
     - name: Extract
       id: extract
@@ -81,7 +83,6 @@ jobs:
     - uses: ./action-dlc
       name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
       with:
-        # repotag: test_project_node
         key: docker-layer-caching-test_project_node-sha:${{ github.sha }}-{hash}
         restore-keys: docker-layer-caching-test_project_node-sha:${{ github.sha }}-
 
@@ -117,8 +118,6 @@ jobs:
     - build_and_push
 
     steps:
-    - uses: actions/checkout@v2
-
     - name: Extract
       id: extract
       run: |

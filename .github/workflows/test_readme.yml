@@ -13,7 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - run: docker-compose -f test_project/docker-compose.yml -p test_project pull
     - uses: satackey/action-docker-layer-caching@v0.0
+    - run: docker rmi $(docker image ls -q)
     - run: docker-compose -f test_project/docker-compose.yml -p test_project build --no-cache
 
   cached_build:
@@ -23,6 +25,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - run: docker-compose -f test_project/docker-compose.yml -p test_project pull
     - uses: satackey/action-docker-layer-caching@v0.0
 
     - name: Get cached image ID
