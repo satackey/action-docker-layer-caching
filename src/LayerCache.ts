@@ -11,7 +11,8 @@ import format from 'string-format'
 class LayerCache {
   // repotag: string
   ids: string[]
-  originalKeyThatMayUnformatted: string = ''
+  unformattedOrigianlKey: string = ''
+  restoredOriginalKey?: string
   // tarFile: string = ''
   imagesDir: string = path.resolve(`${process.cwd()}/./.action-docker-layer-caching-docker_images`)
   enabledParallel = true
@@ -33,7 +34,7 @@ class LayerCache {
   }
 
   async store(key: string) {
-    this.originalKeyThatMayUnformatted = key
+    this.unformattedOrigianlKey = key
     // this.originalKeyToStore = format(key, {
     //   hash: this.getIdhashesPathFriendly()
     // })
@@ -141,7 +142,7 @@ class LayerCache {
   // ---
 
   async restore(key: string, restoreKeys?: string[]) {
-    this.originalKeyThatMayUnformatted = key
+    this.unformattedOrigianlKey = key
     // const restoreKeysIncludedRootKey = [key, ...(restoreKeys !== undefined ? restoreKeys : [])]
     const restoredCacheKey = await this.restoreRoot(restoreKeys)
     if (restoredCacheKey === undefined) {
@@ -167,8 +168,8 @@ class LayerCache {
     if (restoredCacheKeyMayUndefined === undefined) {
       return undefined
     }
-    this.originalKeyThatMayUnformatted = restoredCacheKeyMayUndefined.replace(/-root$/, '')
-    return this.originalKeyThatMayUnformatted
+    this.restoredOriginalKey = restoredCacheKeyMayUndefined.replace(/-root$/, '')
+    return this.restoredOriginalKey
   }
 
   private async restoreLayers() {
@@ -236,7 +237,7 @@ class LayerCache {
 
   getFormattedOriginalCacheKey(hashThatMayBeSpecified?: string) {
     const hash = hashThatMayBeSpecified !== undefined ? hashThatMayBeSpecified : this.getIdhashesPathFriendly()
-    const result = format(this.originalKeyThatMayUnformatted, { hash })
+    const result = format(this.unformattedOrigianlKey, { hash })
     core.debug(JSON.stringify({ log: `getFormattedOriginalCacheKey`, hash, hashThatMayBeSpecified, result }))
     return result
   }
