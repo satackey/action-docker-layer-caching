@@ -1,6 +1,6 @@
 # action-docker-layer-caching [![Readme Test](https://github.com/satackey/action-docker-layer-caching/workflows/Readme%20Test/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3A%22Readme+Test%22) [![CI](https://github.com/satackey/action-docker-layer-caching/workflows/CI/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3ACI)
 
-With only one additional line, you can enable Docker layer caching.
+Enable Docker Layer Caching by adding only one line.
 
 You can use `docker build` and `docker-compose build` with the cache without any special configuration,
 and there is also support for multi-stage builds.
@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    # Avoid caching pull-only images.(docker pull is faster than caching.)
+    # Avoid caching pull-only images.(docker pull is faster than caching in most cases.)
     - run: docker-compose pull
 
     # Images created after this action is called are cached.
@@ -27,7 +27,7 @@ jobs:
 
 ---
 
-By default, the cache is separated by the name of the workflow.
+By default, the cache is separated by the workflow name.
 You can configure manually cache keys.
 
 ```yaml
