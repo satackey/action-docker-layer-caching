@@ -1,4 +1,4 @@
-# action-docker-layer-caching [![Readme Test](https://github.com/satackey/action-docker-layer-caching/workflows/Readme%20Test/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3A%22Readme+Test%22) [![CI](https://github.com/satackey/action-docker-layer-caching/workflows/CI/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3ACI)
+# action-docker-layer-caching [![Readme Test status is unavailable](https://github.com/satackey/action-docker-layer-caching/workflows/Readme%20Test/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3A%22Readme+Test%22) [![CI status is unavailable](https://github.com/satackey/action-docker-layer-caching/workflows/CI/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3ACI)
 
 Enable Docker Layer Caching by adding only one line.
 
@@ -17,12 +17,19 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    # Avoid caching pull-only images.(docker pull is faster than caching in most cases.)
+    # Pull the latest image to build, and avoid caching pull-only images.
+    # (docker pull is faster than caching in most cases.)
     - run: docker-compose pull
 
-    # Images created after this action is called are cached.
+    # In this step, this action saves a list of existing images,
+    # the cache is created without them in the post run.
+    # It also restores the cache if it exists.
     - uses: satackey/action-docker-layer-caching@v0.0
+
     - run: docker-compose build
+
+    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0",
+    # which is the process of saving the cache, will be executed.
 ```
 
 ---
