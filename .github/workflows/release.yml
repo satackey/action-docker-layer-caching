@@ -11,21 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Setup node.js
-      uses: actions/setup-node@v1
+    - uses: actions/setup-node@v1
       with:
         node-version: 12.x
 
-    - name: Checkout
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-    - name: Extract
-      id: extract
-      run: |
-        echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
-
-    - name: Release
-      uses: satackey/push-prebuilt-action@v0.2.0-beta3
+    - uses: satackey/push-prebuilt-action@v0.2.0-beta3
       with:
         push-branch: '{branch}-release'
 
