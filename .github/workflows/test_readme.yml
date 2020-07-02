@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - run: docker image ls -q | xargs docker rmi
     - uses: actions/checkout@v2
     - run: docker-compose -f test_project/docker-compose.yml -p test_project pull
 
@@ -20,7 +21,7 @@ jobs:
         key: docker-layer-caching-${{ github.workflow }}-${{ github.event_name }}-{hash}
         restore-keys: docker-layer-caching-${{ github.workflow }}-${{ github.event_name }}-
 
-    - run: docker rmi $(docker image ls -q)
+    - run: docker image ls -q | xargs docker rmi
     - run: docker-compose -f test_project/docker-compose.yml -p test_project build --no-cache
 
   cached_build:
@@ -29,6 +30,7 @@ jobs:
     - no_cache_build
 
     steps:
+    - run: docker image ls -q | xargs docker rmi
     - uses: actions/checkout@v2
     - run: docker-compose -f test_project/docker-compose.yml -p test_project pull
 
