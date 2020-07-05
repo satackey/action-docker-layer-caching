@@ -40,7 +40,7 @@ jobs:
 
 ## Inputs
 
-See [action.yml](./blob/master/action.yml) for details
+See [action.yml](./action.yml) for details
 
 By default, the cache is separated by the workflow name.
 You can also set the cache key manually, like the official [actions/cache](https://github.com/actions/cache#usage) action.
