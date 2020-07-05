@@ -5,6 +5,8 @@ Enable Docker Layer Caching by adding only one line.
 You can use `docker build` and `docker-compose build` with the cache without any special configuration,
 and there is also support for multi-stage builds.
 
+This action uses the [docker save](https://docs.docker.com/engine/reference/commandline/save/) / [docker load](https://docs.docker.com/engine/reference/commandline/load/) command and the [@actions/cache](https://www.npmjs.com/package/@actions/cache) library.
+
 ```yaml
 name: Readme Test
 
