@@ -1,18 +1,17 @@
 # action-docker-layer-caching [![Readme Test status is unavailable](https://github.com/satackey/action-docker-layer-caching/workflows/Readme%20Test/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3A%22Readme+Test%22) [![CI status is unavailable](https://github.com/satackey/action-docker-layer-caching/workflows/CI/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3ACI)
 
-Enable Docker Layer Caching by adding only one line.
+Enable Docker Layer Caching by adding a single line in GitHub Actions.
 
-You can use `docker build` and `docker-compose build` with the cache without any special configuration,
-and there is also support for multi-stage builds.
+You can run `docker build` and `docker-compose build` in your GitHub Actions workflow using the cache with no special configuration, and it also supports multi-stage builds.
 
-This action uses the [docker save](https://docs.docker.com/engine/reference/commandline/save/) / [docker load](https://docs.docker.com/engine/reference/commandline/load/) command and the [@actions/cache](https://www.npmjs.com/package/@actions/cache) library.
+This GitHub Action uses the [docker save](https://docs.docker.com/engine/reference/commandline/save/) / [docker load](https://docs.docker.com/engine/reference/commandline/load/) command and the [@actions/cache](https://www.npmjs.com/package/@actions/cache) library.
 
 
 ## Example workflow
 
+### Docker Compose
 ```yaml
-name: Readme Test
-
+name: CI
 on: push
 
 jobs:
@@ -31,7 +30,34 @@ jobs:
     # It also restores the cache if it exists.
     - uses: satackey/action-docker-layer-caching@v0.0
 
-    - run: docker-compose build
+    - run: docker-compose up --build
+
+    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0",
+    # which is the process of saving the cache, will be executed.
+```
+
+
+### docker build
+
+```yaml
+name: CI
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # In this step, this action saves a list of existing images,
+    # the cache is created without them in the post run.
+    # It also restores the cache if it exists.
+    - uses: satackey/action-docker-layer-caching@v0.0
+
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
     # Finally, "Post Run satackey/action-docker-layer-caching@v0.0",
     # which is the process of saving the cache, will be executed.
