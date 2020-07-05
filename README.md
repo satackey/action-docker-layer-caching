@@ -37,7 +37,7 @@ jobs:
 ---
 
 By default, the cache is separated by the workflow name.
-You can configure manually cache keys.
+You can also set the cache key manually, like the official [actions/cache](https://github.com/actions/cache#usage) action.
 
 ```yaml
     - uses: satackey/action-docker-layer-caching@v0.0
@@ -47,4 +47,4 @@ You can configure manually cache keys.
           foo-docker-cache-
 ```
 
-**Note: You must include `{hash}` in the `key` input.** (`{hash}` will be replaced with the hash value of the docker image).
+**Note: You must include `{hash}` in the `key` input.** (`{hash}` is replaced by the hash value of the docker image when the action is executed.)
