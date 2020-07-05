@@ -7,6 +7,9 @@ and there is also support for multi-stage builds.
 
 This action uses the [docker save](https://docs.docker.com/engine/reference/commandline/save/) / [docker load](https://docs.docker.com/engine/reference/commandline/load/) command and the [@actions/cache](https://www.npmjs.com/package/@actions/cache) library.
 
+
+## Example workflow
+
 ```yaml
 name: Readme Test
 
@@ -34,7 +37,10 @@ jobs:
     # which is the process of saving the cache, will be executed.
 ```
 
----
+
+## Inputs
+
+See [action.yml](./blob/master/action.yml) for details
 
 By default, the cache is separated by the workflow name.
 You can also set the cache key manually, like the official [actions/cache](https://github.com/actions/cache#usage) action.
