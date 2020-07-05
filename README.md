@@ -7,11 +7,12 @@ You can run `docker build` and `docker-compose build` in your GitHub Actions wor
 This GitHub Action uses the [docker save](https://docs.docker.com/engine/reference/commandline/save/) / [docker load](https://docs.docker.com/engine/reference/commandline/load/) command and the [@actions/cache](https://www.npmjs.com/package/@actions/cache) library.
 
 
-## Example workflow
+## Example workflows
 
 ### Docker Compose
 ```yaml
 name: CI
+
 on: push
 
 jobs:
@@ -28,11 +29,11 @@ jobs:
     # In this step, this action saves a list of existing images,
     # the cache is created without them in the post run.
     # It also restores the cache if it exists.
-    - uses: satackey/action-docker-layer-caching@v0.0
+    - uses: satackey/action-docker-layer-caching@v0.0.3
 
     - run: docker-compose up --build
 
-    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0",
+    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.3",
     # which is the process of saving the cache, will be executed.
 ```
 
@@ -54,12 +55,12 @@ jobs:
     # In this step, this action saves a list of existing images,
     # the cache is created without them in the post run.
     # It also restores the cache if it exists.
-    - uses: satackey/action-docker-layer-caching@v0.0
+    - uses: satackey/action-docker-layer-caching@v0.0.3
 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
-    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0",
+    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.3",
     # which is the process of saving the cache, will be executed.
 ```
 
@@ -72,7 +73,7 @@ By default, the cache is separated by the workflow name.
 You can also set the cache key manually, like the official [actions/cache](https://github.com/actions/cache#usage) action.
 
 ```yaml
-    - uses: satackey/action-docker-layer-caching@v0.0
+    - uses: satackey/action-docker-layer-caching@v0.0.3
       with:
         key: foo-docker-cache-{hash}
         restore-keys: |
