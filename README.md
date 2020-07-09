@@ -1,7 +1,7 @@
 # Docker Layer Caching in GitHub Actions [![Readme Test status is unavailable](https://github.com/satackey/action-docker-layer-caching/workflows/Readme%20Test/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3A%22Readme+Test%22) [![CI status is unavailable](https://github.com/satackey/action-docker-layer-caching/workflows/CI/badge.svg)](https://github.com/satackey/action-docker-layer-caching/actions?query=workflow%3ACI)
 
 Enable Docker Layer Caching by adding a single line in GitHub Actions.
-This GitHub Action speeds up the building of docker images in your GitHub Action workflow.
+This GitHub Action speeds up the building of docker images in your GitHub Actions workflow.
 
 You can run `docker build` and `docker-compose build` in your GitHub Actions workflow using the cache with no special configuration, and it also supports multi-stage builds.
 
