@@ -20,19 +20,13 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Debug logs**
+If applicable, add debug logs to help explain your problem.
+Learn more about enabling the debug log at https://docs.github.com/en/actions/configuring-and-managing-workflows/managing-a-workflow-run#enabling-debug-logging
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Runner Environment (please complete the following information):**
+ - OS: [e.g. ubuntu-18.04]
+ - Action version: [e.g. v0.0.3]
 
 **Additional context**
 Add any other context about the problem here.
