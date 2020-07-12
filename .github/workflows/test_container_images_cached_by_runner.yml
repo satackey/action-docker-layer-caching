@@ -12,24 +12,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history {}'
+    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history "{}"'
 
     - uses: actions/checkout@v2
     - run: docker-compose -f test_project/docker-compose.yml -p test_project pull
 
-    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history {}'
+    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history "{}"'
 
     - uses: satackey/action-docker-layer-caching@v0.0
       with:
         key: docker-layer-caching-${{ github.workflow }}-${{ github.event_name }}-{hash}
         restore-keys: docker-layer-caching-${{ github.workflow }}-${{ github.event_name }}-
 
-    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history {}'
+    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history "{}"'
 
     - run: docker image ls -q | xargs docker rmi
     - run: docker-compose -f test_project/docker-compose.yml -p test_project build --no-cache
 
-    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history {}'
+    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history "{}"'
 
   cached_build:
     runs-on: ubuntu-latest
@@ -37,19 +37,19 @@ jobs:
     - no_cache_build
 
     steps:
-    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history {}'
+    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history "{}"'
 
     - uses: actions/checkout@v2
     - run: docker-compose -f test_project/docker-compose.yml -p test_project pull
 
-    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history {}'
+    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history "{}"'
 
     - uses: satackey/action-docker-layer-caching@v0.0
       with:
         key: docker-layer-caching-${{ github.workflow }}-${{ github.event_name }}-{hash}
         restore-keys: docker-layer-caching-${{ github.workflow }}-${{ github.event_name }}-
 
-    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history {}'
+    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history "{}"'
 
     - name: Get cached image ID
       run: echo ::set-output name=id::$(docker image ls -q test_project_node)
@@ -57,7 +57,7 @@ jobs:
 
     - run: docker-compose -f test_project/docker-compose.yml -p test_project build
 
-    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history {}'
+    - run: docker image ls --format '{{ .Repository }}:{{ .Tag }}' | xargs -I{} sh -c 'set -x && docker history "{}"'
 
     - name: Show built image ID
       run: echo ::set-output name=id::$(docker image ls -q test_project_node)
