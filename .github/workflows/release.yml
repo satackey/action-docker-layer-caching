@@ -4,10 +4,11 @@ on:
   push:
     branches:
     - '**'
+  pull_request:
   delete:
 
 jobs:
-  build_and_push:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,18 +17,32 @@ jobs:
         node-version: 12.x
 
     - uses: actions/checkout@v2
+    
+    - name: Output info
+      id: info
+      run: |
+        if [ '${{ github.event_name }}' = 'pull_request' ]; then
+          echo '::set-output name=commit_message::'
+          exit 0
+        fi
+        echo '::set-output name=commit_message::[auto]'
 
     - uses: satackey/push-prebuilt-action@v0.2.0-beta3
       with:
+        commit-message: ${{ steps.info.outputs.commit_message }}
         push-branch: '{branch}-release'
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: built
+        path: ./
 
   # 
   # test built image caching
 
   test_saving_built:
     runs-on: ubuntu-latest
-    needs:
-    - build_and_push
+    needs: build
 
     steps:
     - uses: actions/checkout@v2
@@ -37,11 +52,11 @@ jobs:
       id: extract
       run: |
         echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
-
-    - uses: actions/checkout@v2
-      name: Pull action
+    
+    - name: Download action
+      uses: actions/download-artifact@v2
       with:
-        ref: ${{ steps.extract.outputs.branch }}-release
+        name: built
         path: action-dlc
 
     - uses: ./action-dlc
@@ -54,8 +69,7 @@ jobs:
 
   test_restoring_built:
     runs-on: ubuntu-latest
-    needs:
-    - test_saving_built
+    needs: test_saving_built
 
     steps:
     - uses: actions/checkout@v2
@@ -66,10 +80,10 @@ jobs:
       run: |
         echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
 
-    - uses: actions/checkout@v2
-      name: Pull action
+    - name: Download action
+      uses: actions/download-artifact@v2
       with:
-        ref: ${{ steps.extract.outputs.branch }}-release
+        name: built
         path: action-dlc
 
     - uses: ./action-dlc
@@ -106,8 +120,7 @@ jobs:
 
   test_saving_pulled:
     runs-on: ubuntu-latest
-    needs:
-    - build_and_push
+    needs: build
 
     steps:
     - name: Extract
@@ -115,10 +128,10 @@ jobs:
       run: |
         echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
 
-    - uses: actions/checkout@v2
-      name: Pull action
+    - name: Download action
+      uses: actions/download-artifact@v2
       with:
-        ref: ${{ steps.extract.outputs.branch }}-release
+        name: built
         path: action-dlc
 
     - uses: ./action-dlc
@@ -131,8 +144,7 @@ jobs:
 
   test_restoring_pulled:
     runs-on: ubuntu-latest
-    needs:
-    - test_saving_pulled
+    needs: test_saving_pulled
 
     steps:
     - name: Extract
@@ -140,10 +152,10 @@ jobs:
       run: |
         echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
 
-    - uses: actions/checkout@v2
-      name: Pull action
+    - name: Download action
+      uses: actions/download-artifact@v2
       with:
-        ref: ${{ steps.extract.outputs.branch }}-release
+        name: built
         path: action-dlc
 
     - uses: ./action-dlc
