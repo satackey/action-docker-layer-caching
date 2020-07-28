@@ -26,7 +26,7 @@ Learn more about enabling the debug log at https://docs.github.com/en/actions/co
 
 **Runner Environment (please complete the following information):**
  - OS: [e.g. ubuntu-18.04]
- - Action version: [e.g. v0.0.3]
+ - Action version: [e.g. v0.0.4]
 
 **Additional context**
 Add any other context about the problem here.
