@@ -62,7 +62,7 @@ jobs:
           }
 
     outputs:
-      matrix: ${{ steps.set_matrix.outputs.result }}
+      matrix: fromJSON(${{ steps.set_matrix.outputs.result }})
 
   test_saving:
     if: github.event_name != 'delete'
