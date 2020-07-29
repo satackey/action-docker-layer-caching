@@ -96,7 +96,7 @@ jobs:
     - run: ${{ matrix.build_command }}
 
   test_restoring:
-    needs: test_saving
+    needs: [build, test_saving]
     strategy:
       matrix: ${{ fromJSON(needs.build.outputs.matrix) }}
     runs-on: ubuntu-latest
