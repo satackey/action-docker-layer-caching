@@ -62,13 +62,13 @@ jobs:
           }
 
     outputs:
-      matrix: fromJSON(${{ steps.set_matrix.outputs.result }})
+      matrix: ${{ steps.set_matrix.outputs.result }}
 
   test_saving:
     if: github.event_name != 'delete'
     needs: build
     strategy:
-      matrix: ${{ needs.build.outputs.matrix }}
+      matrix: ${{ fromJSON(needs.build.outputs.matrix) }}
     runs-on: ubuntu-latest
 
     steps:
@@ -98,7 +98,7 @@ jobs:
   test_restoring:
     needs: test_saving
     strategy:
-      matrix: ${{ needs.build.outputs.matrix }}
+      matrix: ${{ fromJSON(needs.build.outputs.matrix) }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
