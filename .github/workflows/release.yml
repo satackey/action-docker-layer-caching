@@ -55,7 +55,7 @@ jobs:
                 build_command: 'docker-compose -f test_project/docker-compose.yml -p test_project build',
               }, {
                 inspect_image: 'amazon/aws-cli',
-                prepare_command: 'echo',
+                prepare_command: ':',
                 build_command: 'docker pull amazon/aws-cli',
               },
             ],
