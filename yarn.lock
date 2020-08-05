@@ -329,6 +329,11 @@ minimatch@^3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
+native-promise-pool@^3.13.0:
+  version "3.13.0"
+  resolved "https://registry.yarnpkg.com/native-promise-pool/-/native-promise-pool-3.13.0.tgz#faeaf9b4ee769a79328cc0435930079ad951b27b"
+  integrity sha512-CnUhv57AXMyxGazhYrqhlhwRg1rG36ygrDlnaCa70jBOePhV+OLM9CZkUAgceTXO6BZEQ3F5GRRWwB+wSzI4Aw==
+
 nested-error-stacks@^2:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-2.1.0.tgz#0fbdcf3e13fe4994781280524f8b96b0cdff9c61"

@@ -18,6 +18,7 @@ const main = async () => {
   await imageDetector.getExistingImages()
   core.debug(JSON.stringify({ imageIdsToSave: imageDetector.getImagesShouldSave() }))
   const layerCache = new LayerCache(imageDetector.getImagesShouldSave())
+  layerCache.concurrency = parseInt(core.getInput(`concurrency`, { required: true }), 10)
 
   layerCache.unformattedOrigianlKey = primaryKey
   core.debug(JSON.stringify({ restoredKey, formattedOriginalCacheKey: layerCache.getFormattedOriginalCacheKey()}))
