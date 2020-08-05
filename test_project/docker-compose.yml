@@ -1,9 +1,0 @@
-version: '3'
-
-services:
-  node:
-    build:
-      context: ../
-      dockerfile: ./test_project/Dockerfile
-  mysql_pull_only:
-    image: mysql:8.0

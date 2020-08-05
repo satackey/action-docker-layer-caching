@@ -1,25 +1,24 @@
 name: Docker Layer Caching
 description: Cache images created between main run and post run
-
 branding:
   icon: layers
   color: blue
-
 inputs:
   key:
     description: An explicit key for restoring and saving the cache
     required: true
-    default: docker-layer-caching-${{ github.workflow }}-{hash}
+    default: 'docker-layer-caching-${{ github.workflow }}-{hash}'
   restore-keys:
-    description: An ordered list of keys to use for restoring the cache if no cache hit occurred for key 
+    description: >-
+      An ordered list of keys to use for restoring the cache if no cache hit
+      occurred for key
     required: false
-    default: docker-layer-caching-${{ github.workflow }}-
+    default: 'docker-layer-caching-${{ github.workflow }}-'
   concurrency:
     description: The number of concurrency when restoring and saving layers
     required: true
     default: '4'
-
 runs:
   using: node12
-  main: main.ts
-  post: post.ts
+  main: dist/ttsc-dist/main.js/index.js
+  post: dist/ttsc-dist/post.js/index.js
