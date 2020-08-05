@@ -9,8 +9,8 @@ This GitHub Action uses the [docker save](https://docs.docker.com/engine/referen
 
 ## ⚠️ **Deprecation Notice for `v0.0.4` and older** ⚠️
 
-The author had not taken into account that a large number of layers would be cached,
-so those versions processes all layers in parallel. ([#12](https://github.com/satackey/action-docker-layer-caching/issues/12))  
+The author had not considered a large number of layers to be cached, so those versions process all layers in parallel.
+([#12](https://github.com/satackey/action-docker-layer-caching/issues/12))  
 **Please update to version `v0.0.5` with limited concurrency to avoid overloading the cache service.**
 
 ## Example workflows
