@@ -7,6 +7,11 @@ You can run `docker build` and `docker-compose build` in your GitHub Actions wor
 
 This GitHub Action uses the [docker save](https://docs.docker.com/engine/reference/commandline/save/) / [docker load](https://docs.docker.com/engine/reference/commandline/load/) command and the [@actions/cache](https://www.npmjs.com/package/@actions/cache) library.
 
+## ⚠️ **Deprecation Notice for `v0.0.4` and older** ⚠️
+
+The author had not taken into account that a large number of layers would be cached,
+so those versions processes all layers in parallel. ([#12](https://github.com/satackey/action-docker-layer-caching/issues/12))  
+**Please update to version `v0.0.5` with limited concurrency to avoid overloading the cache service.**
 
 ## Example workflows
 
@@ -30,11 +35,11 @@ jobs:
     # In this step, this action saves a list of existing images,
     # the cache is created without them in the post run.
     # It also restores the cache if it exists.
-    - uses: satackey/action-docker-layer-caching@v0.0.4
+    - uses: satackey/action-docker-layer-caching@v0.0.5
 
     - run: docker-compose up --build
 
-    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.4",
+    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.5",
     # which is the process of saving the cache, will be executed.
 ```
 
@@ -56,12 +61,12 @@ jobs:
     # In this step, this action saves a list of existing images,
     # the cache is created without them in the post run.
     # It also restores the cache if it exists.
-    - uses: satackey/action-docker-layer-caching@v0.0.4
+    - uses: satackey/action-docker-layer-caching@v0.0.5
 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
-    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.4",
+    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.5",
     # which is the process of saving the cache, will be executed.
 ```
 
@@ -74,7 +79,7 @@ By default, the cache is separated by the workflow name.
 You can also set the cache key manually, like the official [actions/cache](https://github.com/actions/cache#usage) action.
 
 ```yaml
-    - uses: satackey/action-docker-layer-caching@v0.0.4
+    - uses: satackey/action-docker-layer-caching@v0.0.5
       with:
         key: foo-docker-cache-{hash}
         restore-keys: |
