@@ -11,6 +11,7 @@ const main = async () => {
   core.saveState(`already-existing-images`, JSON.stringify(await new ImageDetector().getExistingImages()))
 
   const layerCache = new LayerCache([])
+  layerCache.concurrency = parseInt(core.getInput(`concurrency`, { required: true }), 10)
   const restoredKey = await layerCache.restore(primaryKey, restoreKeys)
   await layerCache.cleanUp()
 

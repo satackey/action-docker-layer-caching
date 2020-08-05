@@ -14,6 +14,10 @@ inputs:
     description: An ordered list of keys to use for restoring the cache if no cache hit occurred for key 
     required: false
     default: docker-layer-caching-${{ github.workflow }}-
+  concurrency:
+    description: The number of concurrency when restoring and saving layers
+    required: true
+    default: '4'
 
 runs:
   using: node12

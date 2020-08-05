@@ -7,6 +7,7 @@ import { ExecOptions } from '@actions/exec/lib/interfaces'
 import { promises as fs } from 'fs'
 import { assertManifests, Manifest, Manifests } from './Tar'
 import format from 'string-format'
+import PromisePool from 'native-promise-pool'
 
 class LayerCache {
   // repotag: string
@@ -18,6 +19,7 @@ class LayerCache {
   enabledParallel = true
   // unpackedTarDir: string = ''
   // manifests: Manifests = []
+  concurrency: number = 4
 
   constructor(ids: string[]) {
     // this.repotag = repotag
@@ -108,7 +110,16 @@ class LayerCache {
   }
 
   private async storeLayers(): Promise<number[]> {
-    return await Promise.all((await this.getLayerIds()).map(layerId => this.storeSingleLayerBy(layerId)))
+    const pool = new PromisePool(this.concurrency)
+
+    const result =  Promise.all(
+      (await this.getLayerIds()).map(
+        layerId => {
+          return pool.open(() => this.storeSingleLayerBy(layerId))
+        }
+      )
+    )
+    return result
   }
 
   static async dismissCacheAlreadyExistsError(promise: Promise<number>): Promise<number> {
@@ -173,16 +184,31 @@ class LayerCache {
   }
 
   private async restoreLayers() {
-    const restoring = (await this.getLayerIds()).map(layerId => this.restoreSingleLayerBy(layerId));
-    const restoredLayerKeysThatMayContainUndefined = await Promise.all(restoring)
+    const pool = new PromisePool(this.concurrency)
+
+    const restoredLayerKeysThatMayContainUndefined = await Promise.all(
+      (await this.getLayerIds()).map(
+        layerId => {
+          return pool.open(() => this.restoreSingleLayerBy(layerId))
+        }
+      )
+    )
+
     core.debug(JSON.stringify({ log: `restoreLayers`, restoredLayerKeysThatMayContainUndefined }))
     const FailedToRestore = (restored: string | undefined) => restored === undefined
     return restoredLayerKeysThatMayContainUndefined.filter(FailedToRestore).length === 0
   }
 
-  private async restoreSingleLayerBy(id: string): Promise<string | undefined> {
+  private async restoreSingleLayerBy(id: string): Promise<string> {
     core.debug(JSON.stringify({ log: `restoreSingleLayerBy`, id }))
-    return await cache.restoreCache([this.genSingleLayerStorePath(id)], this.genSingleLayerStoreKey(id))
+
+    const result = await cache.restoreCache([this.genSingleLayerStorePath(id)], this.genSingleLayerStoreKey(id))
+
+    if (result == null) {
+      throw new Error(`Layer cache not found: ${JSON.stringify({ id })}`)
+    }
+
+    return result
   }
 
   private async loadImageFromUnpacked() {
