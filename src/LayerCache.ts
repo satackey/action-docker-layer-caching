@@ -9,20 +9,6 @@ import { assertManifests, Manifest, Manifests } from './Tar'
 import format from 'string-format'
 import PromisePool from 'native-promise-pool'
 
-type ReturnPromiseFunc = <T>(arg: any) => Promise<T[]>
-
-const createPromiseProducerFromArray = <T, T2>(array: T[], callBackFunc: ((t: T) => Promise<T2>)) => {
-  const currentIndex = 0;
-
-  return () => callBackFunc(array[currentIndex])
-}
-
-const generatePromise = function * <T1, T2>(array: T1[], callbackFunc: ((t: T1) => Promise<T2>)) {
-  for (let i = 0; i < array.length; i++) {
-    yield callbackFunc(array[i])
-  }
-}
-
 class LayerCache {
   // repotag: string
   ids: string[]
@@ -198,10 +184,6 @@ class LayerCache {
   }
 
   private async restoreLayers() {
-    const restoring = (await this.getLayerIds()).map(layerId => this.restoreSingleLayerBy(layerId));
-
-    const promiseIter = generatePromise(await this.getLayerIds(), layerId => this.restoreSingleLayerBy(layerId))
-
     const pool = new PromisePool(this.concurrency)
 
     const restoredLayerKeysThatMayContainUndefined = await Promise.all(
