@@ -6,7 +6,7 @@
   "author": "satackey <21271711+satackey@users.noreply.github.com>",
   "license": "MIT",
   "dependencies": {
-    "@actions/cache": "^1.0.1",
+    "@actions/cache": "^1.0.2",
     "@actions/core": "^1.2.4",
     "actions-exec-listener": "^0.0.2",
     "crypto": "^1.0.1",
