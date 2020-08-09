@@ -20,7 +20,7 @@ export class ImageDetector {
     const commands = [this.GET_ID_COMMAND, this.GET_REPOTAGS_COMMAND, this.GET_DIGESTS_COMMAND]
     const results = []
     for await (const command of commands) {
-      const commandResult = (await exec.exec(command, [], { silent: true })).stdoutStr
+      const commandResult = (await exec.exec(command)).stdoutStr
       results.push(commandResult.split(`\n`).filter(isEmptyStr))
     }
 
