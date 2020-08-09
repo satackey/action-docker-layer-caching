@@ -1,3 +1,5 @@
+import 'source-map-support/register'
+
 import * as core from '@actions/core'
 import exec from 'actions-exec-listener'
 import { LayerCache } from './src/LayerCache'

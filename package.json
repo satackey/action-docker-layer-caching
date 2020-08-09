@@ -11,6 +11,7 @@
     "actions-exec-listener": "^0.0.2",
     "crypto": "^1.0.1",
     "native-promise-pool": "^3.13.0",
+    "source-map-support": "^0.5.19",
     "string-format": "^2.0.0",
     "typescript-is": "^0.16.3"
   },
