@@ -56,7 +56,7 @@ class LayerCache {
 
   private async saveImageAsUnpacked() {
     await this.exec('mkdir -p', [this.getSavedImageTarDir()], { silent: true })
-    await this.exec(`sh -c`, [`docker save '${(await this.makeRepotagsDockerSaveArgReady(this.ids)).join(`' '`)}' | tar xf - -C ${this.getSavedImageTarDir()}`])
+    await this.exec(`sh -c`, [`docker save '${(await this.makeRepotagsDockerSaveArgReady(this.ids)).join(`' '`)}' > tmp.tar && tar xf tmp.tar -C ${this.getSavedImageTarDir()} && rm -f tmp.tar`])
   }
 
   private async makeRepotagsDockerSaveArgReady(repotags: string[]): Promise<string[]> {
