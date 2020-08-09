@@ -1,14 +1,13 @@
 import exec from 'actions-exec-listener'
 import * as core from '@actions/core'
-import PromisePool from 'native-promise-pool/compiled-types'
 
 export class ImageDetector {
   alreadyExistedImages: Set<string> = new Set([])
   existingImages: Set<string> = new Set([])
 
   GET_ID_COMMAND = `docker image ls -q`
-  GET_REPOTAGS_COMMAND = `sh -c "docker images --format '{{ .Repository }}:{{ .Tag }}' --filter 'dangling=false' | grep -v '<none>'"`
-  GET_DIGESTS_COMMAND = `docker images --format='{{ .Repository }}@{{ .ID }}' --no-trunc`
+  GET_REPOTAGS_COMMAND = `sh -c "docker image ls --format '{{ .Repository }}:{{ .Tag }}' --filter 'dangling=false' | grep -v '<none>'"`
+  GET_DIGESTS_COMMAND = `sh -c "docker image ls --format='{{ .Repository }}@{{ .ID }}' --no-trunc"`
 
   registerAlreadyExistedImages(images: string[]) {
     images.forEach(image => this.alreadyExistedImages.add(image))
