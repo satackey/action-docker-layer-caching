@@ -1,5 +1,6 @@
 import exec from 'actions-exec-listener'
 import * as core from '@actions/core'
+import PromisePool from 'native-promise-pool/compiled-types'
 
 export class ImageDetector {
   alreadyExistedImages: Set<string> = new Set([])
@@ -12,17 +13,19 @@ export class ImageDetector {
   registerAlreadyExistedImages(images: string[]) {
     images.forEach(image => this.alreadyExistedImages.add(image))
   }
+
   async getExistingImages(): Promise<string[]> {
     const isEmptyStr = (str: string) => str !== ``
 
-    const [ids, repotags, digests] = await Promise.all(
-      [this.GET_ID_COMMAND, this.GET_REPOTAGS_COMMAND, this.GET_DIGESTS_COMMAND].map(async command =>
-        (await exec.exec(command, [], { silent: true })).stdoutStr.split(`\n`).filter(isEmptyStr)
-      )
-    )
+    const commands = [this.GET_ID_COMMAND, this.GET_REPOTAGS_COMMAND, this.GET_DIGESTS_COMMAND]
+    const results = []
+    for await (const command of commands) {
+      const commandResult = (await exec.exec(command, [], { silent: true })).stdoutStr
+      results.push(commandResult.split(`\n`).filter(isEmptyStr))
+    }
 
-    core.debug(JSON.stringify({ log: `getExistingImages`, ids, repotags, digests }));
-    ([...ids, ...repotags, ...digests]).forEach(image => this.existingImages.add(image))
+    core.debug(JSON.stringify({ log: `getExistingImages`, results }));
+    results.flat().forEach(image => this.existingImages.add(image))
 
     return Array.from(this.existingImages)
   }
