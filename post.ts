@@ -5,6 +5,11 @@ import { LayerCache } from './src/LayerCache'
 import { ImageDetector } from './src/ImageDetector'
 import { assertType } from 'typescript-is'
 const main = async () => {
+  if (core.getInput('skip-save')) {
+    core.info('Skipping save.')
+    return
+  }
+
   const primaryKey = core.getInput('key', { required: true })
   const restoredKey = JSON.parse(core.getState(`restored-key`)) as string
 
