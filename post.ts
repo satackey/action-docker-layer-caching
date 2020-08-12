@@ -4,8 +4,9 @@ import exec from 'actions-exec-listener'
 import { LayerCache } from './src/LayerCache'
 import { ImageDetector } from './src/ImageDetector'
 import { assertType } from 'typescript-is'
+
 const main = async () => {
-  if (core.getInput('skip-save')) {
+  if (core.getInput('skip-save') != null) {
     core.info('Skipping save.')
     return
   }
