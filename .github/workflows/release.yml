@@ -91,7 +91,6 @@ jobs:
       name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
       with:
         key: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
-        restore-keys: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
 
     - run: ${{ matrix.build_command }}
 
@@ -119,7 +118,7 @@ jobs:
     - uses: ./action-dlc
       name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
       with:
-        key: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
+        key: never-restored-docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
         restore-keys: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
         skip-save: 'true'
 
