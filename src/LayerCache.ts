@@ -26,10 +26,7 @@ class LayerCache {
   }
 
   async exec(command: string, args?: string[], options?: ExecOptions) {
-    const argsStr = args != null ? args.join(' ') : ''
-    core.startGroup(`${command} ${argsStr}`)
     const result = await exec.exec(command, args, options)
-    core.endGroup()
 
     return result
   }

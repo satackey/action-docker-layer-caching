@@ -45,12 +45,12 @@ jobs:
         script: |
           return {
             inspect_image: [
-              'test_project_node',
+              'test_project_scratch',
               'hello-world',
             ],
             include: [
               {
-                inspect_image: 'test_project_node',
+                inspect_image: 'test_project_scratch',
                 prepare_command: 'docker-compose -f test_project/docker-compose.yml -p test_project pull',
                 build_command: 'docker-compose -f test_project/docker-compose.yml -p test_project build',
               }, {
