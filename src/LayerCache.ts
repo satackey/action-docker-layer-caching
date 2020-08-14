@@ -171,6 +171,8 @@ class LayerCache {
       return undefined
     }
     this.restoredRootKey = restoredRootKey
+
+    return restoredRootKey
   }
 
   private async restoreLayers(): Promise<boolean> {
