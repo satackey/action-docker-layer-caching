@@ -46,7 +46,7 @@ jobs:
           return {
             inspect_image: [
               'test_project_node',
-              'amazon/aws-cli',
+              'hello-world',
             ],
             include: [
               {
@@ -54,9 +54,9 @@ jobs:
                 prepare_command: 'docker-compose -f test_project/docker-compose.yml -p test_project pull',
                 build_command: 'docker-compose -f test_project/docker-compose.yml -p test_project build',
               }, {
-                inspect_image: 'amazon/aws-cli',
+                inspect_image: 'hello-world',
                 prepare_command: ':',
-                build_command: 'docker pull amazon/aws-cli',
+                build_command: 'docker pull hello-world',
               },
             ],
           }
