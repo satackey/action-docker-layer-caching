@@ -242,13 +242,6 @@ class LayerCache {
     return 'image'
   }
 
-  async getIdhashesPathFriendly(): Promise<string> {
-    const result = crypto.createHash(`sha256`).update((await this.getLayerIds()).join(`-`), `utf8`).digest(`hex`)
-    core.debug(JSON.stringify({ log: `getIdhashesPathFriendly`, result }))
-    return result
-  }
-
-
   genSingleLayerStorePath(id: string) {
     return `${this.getLayerCachesDir()}/${id}/layer.tar`
   }
@@ -283,7 +276,9 @@ class LayerCache {
   }
 
   async recoverUnformattedSaveKey() {
-    const hash = await loadRawManifests(this.getUnpackedTarDir())
+    const hash = await this.generateRootHashFromManifest()
+    core.debug(JSON.stringify({ log: `recoverUnformattedSaveKey`, hash}))
+
     return this.restoredRootKey.replace(hash, `{hash}`).replace(/-root$/, ``)
   }
 
