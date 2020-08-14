@@ -19,7 +19,7 @@ const main = async () => {
 
   core.saveState(`restored-key`, JSON.stringify(restoredKey !== undefined ? restoredKey : ''))
   core.saveState(`already-existing-images`, JSON.stringify(alreadyExistingImages))
-  core.saveState(`restored-images`, JSON.stringify(imageDetector.getImagesShouldSave(alreadyExistingImages)))
+  core.saveState(`restored-images`, JSON.stringify(await imageDetector.getImagesShouldSave(alreadyExistingImages)))
 }
 
 main().catch(e => {
