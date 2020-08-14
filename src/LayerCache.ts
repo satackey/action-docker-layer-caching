@@ -273,7 +273,7 @@ class LayerCache {
   
   async recoverSingleLayerKey(id: string) {
     const unformatted = await this.recoverUnformattedSaveKey()
-    return format(unformatted, { hash: id })
+    return format(`layer-${unformatted}`, { hash: id })
   }
 
   async getFormattedSaveKey(hash: string) {
