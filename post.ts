@@ -6,7 +6,7 @@ import { ImageDetector } from './src/ImageDetector'
 import { assertType } from 'typescript-is'
 
 const main = async () => {
-  if (core.getInput('skip-save') != null) {
+  if (JSON.parse(core.getInput('skip-save', { required: true }))) {
     core.info('Skipping save.')
     return
   }
