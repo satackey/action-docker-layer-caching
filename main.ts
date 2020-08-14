@@ -4,7 +4,6 @@ import { LayerCache } from './src/LayerCache'
 import {  ImageDetector } from './src/ImageDetector'
 
 const main = async () => {
-  // const repotag = core.getInput(`repotag`, { required: true })
   const primaryKey = core.getInput(`key`, { required: true })
   const restoreKeys = core.getInput(`restore-keys`, { required: false }).split(`\n`).filter(key => key !== ``)
 

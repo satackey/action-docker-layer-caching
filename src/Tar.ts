@@ -14,7 +14,7 @@ export function assertManifests(x: unknown): asserts x is Manifests {
 }
 
 export async function loadRawManifests(path: string) {
-  return (await fs.readFile(`${path}/manifests.json`)).toString()
+  return (await fs.readFile(`${path}/manifest.json`)).toString()
 }
 export async function loadManifests(path: string) {
   const raw = await loadRawManifests(path)

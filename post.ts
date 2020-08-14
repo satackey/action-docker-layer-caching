@@ -1,5 +1,4 @@
 import * as core from '@actions/core'
-import exec from 'actions-exec-listener'
 
 import { LayerCache } from './src/LayerCache'
 import { ImageDetector } from './src/ImageDetector'
