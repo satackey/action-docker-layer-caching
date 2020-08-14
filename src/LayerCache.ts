@@ -179,15 +179,19 @@ class LayerCache {
   private async restoreLayers(): Promise<boolean> {
     const pool = new PromisePool(this.concurrency)
 
+    const tasks = (await this.getLayerIds()).map(
+      layerId => pool.open(() => this.restoreSingleLayerBy(layerId))
+    )
+
     try {
-      await (await this.getLayerIds()).map(
-        layerId => {
-          return pool.open(() => this.restoreSingleLayerBy(layerId))
-        }
-      )
+      await Promise.all(tasks)
     } catch (e) {
       if (typeof e.message === `string` && e.message.includes(LayerCache.ERROR_LAYER_CACHE_NOT_FOUND_STR)) {
         core.info(e.message)
+
+        // Avoid UnhandledPromiseRejectionWarning
+        tasks.map(task => task.catch(core.info))
+
         return false
       }
       throw e
@@ -280,7 +284,7 @@ class LayerCache {
 
   async recoverUnformattedSaveKey() {
     const hash = await loadRawManifests(this.getUnpackedTarDir())
-    return this.restoredRootKey.replace(hash, `{hash}`)
+    return this.restoredRootKey.replace(hash, `{hash}`).replace(/-root$/, ``)
   }
 
   async getLayerTarFiles(): Promise<string[]> {
