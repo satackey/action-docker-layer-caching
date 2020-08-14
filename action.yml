@@ -21,6 +21,7 @@ inputs:
   skip-save:
     description: Skip saving layers in the post step
     required: false
+    default: 'false'
 
 runs:
   using: node12
