@@ -21,6 +21,9 @@ class LayerCache {
   // manifests: Manifests = []
   concurrency: number = 4
 
+  static ERROR_CACHE_ALREAD_EXISTS_STR = `Cache already exists`
+  static ERROR_LAYER_CACHE_NOT_FOUND_STR = `Layer cache not found`
+
   constructor(ids: string[]) {
     // this.repotag = repotag
     this.ids = ids
@@ -84,7 +87,7 @@ class LayerCache {
       this.getUnpackedTarDir(),
     ]
     core.info(`Start storing root cache, key: ${rootKey}, dir: ${paths}`)
-    const cacheId = await LayerCache.dismissCacheAlreadyExistsError(cache.saveCache(paths, rootKey))
+    const cacheId = await LayerCache.dismissError(cache.saveCache(paths, rootKey), LayerCache.ERROR_CACHE_ALREAD_EXISTS_STR, -1)
     core.info(`Stored root cache, key: ${rootKey}, id: ${cacheId}`)
     return cacheId !== -1 ? cacheId : undefined
   }
@@ -122,20 +125,19 @@ class LayerCache {
     return result
   }
 
-  static async dismissCacheAlreadyExistsError(promise: Promise<number>): Promise<number> {
-    let result = -1
+  static async dismissError<T>(promise: Promise<T>, dismissStr: string, defaultResult: T): Promise<T> {
     try {
-      result = await promise
-      return result
+      return await promise
     } catch (e) {
       core.debug(`catch error: ${e.toString()}`)
-      if (typeof e.message !== 'string' || !e.message.includes(`Cache already exists`)) {
+      if (typeof e.message !== 'string' || !e.message.includes(dismissStr)) {
         core.error(`Unexpected error: ${e.toString()}`)
         throw e
       }
-      core.info(`info: Cache already exists: ${e.toString()}`)
+
+      core.info(`${dismissStr}: ${e.toString()}`)
       core.debug(e)
-      return result
+      return defaultResult
     }
   }
 
@@ -144,7 +146,7 @@ class LayerCache {
     const key = this.genSingleLayerStoreKey(id)
 
     core.info(`Start storing layer cache: ${key}`)
-    const cacheId = await LayerCache.dismissCacheAlreadyExistsError(cache.saveCache([path], key))
+    const cacheId = await LayerCache.dismissError(cache.saveCache([path], key), LayerCache.ERROR_CACHE_ALREAD_EXISTS_STR, -1)
     core.info(`Stored layer cache, key: ${key}, id: ${cacheId}`)
 
     return cacheId
@@ -183,20 +185,24 @@ class LayerCache {
     return this.restoredOriginalKey
   }
 
-  private async restoreLayers() {
+  private async restoreLayers(): Promise<boolean> {
     const pool = new PromisePool(this.concurrency)
 
-    const restoredLayerKeysThatMayContainUndefined = await Promise.all(
-      (await this.getLayerIds()).map(
+    try {
+      await (await this.getLayerIds()).map(
         layerId => {
           return pool.open(() => this.restoreSingleLayerBy(layerId))
         }
       )
-    )
+    } catch (e) {
+      if (typeof e.message === `string` && e.message.includes(LayerCache.ERROR_LAYER_CACHE_NOT_FOUND_STR)) {
+        core.info(e.message)
+        return false
+      }
+      throw e
+    }
 
-    core.debug(JSON.stringify({ log: `restoreLayers`, restoredLayerKeysThatMayContainUndefined }))
-    const FailedToRestore = (restored: string | undefined) => restored === undefined
-    return restoredLayerKeysThatMayContainUndefined.filter(FailedToRestore).length === 0
+    return true
   }
 
   private async restoreSingleLayerBy(id: string): Promise<string> {
@@ -205,7 +211,7 @@ class LayerCache {
     const result = await cache.restoreCache([this.genSingleLayerStorePath(id)], this.genSingleLayerStoreKey(id))
 
     if (result == null) {
-      throw new Error(`Layer cache not found: ${JSON.stringify({ id })}`)
+      throw new Error(`${LayerCache.ERROR_LAYER_CACHE_NOT_FOUND_STR}: ${JSON.stringify({ id })}`)
     }
 
     return result
