@@ -5,7 +5,8 @@ import * as core from '@actions/core'
 import * as cache from '@actions/cache'
 import { ExecOptions } from '@actions/exec/lib/interfaces'
 import { promises as fs } from 'fs'
-import { assertManifests, Manifest, Manifests, loadManifests, loadRawManifests } from './Tar'
+import recursiveReaddir from 'recursive-readdir'
+import { Manifest, loadManifests, loadRawManifests } from './Tar'
 import format from 'string-format'
 import PromisePool from 'native-promise-pool'
 
@@ -92,7 +93,7 @@ class LayerCache {
   }
 
   private async moveLayerTarsInDir(fromDir: string, toDir: string) {
-    const layerTars = (await fs.readdir(fromDir)).filter(path => path.endsWith(`/layer.tar`))
+    const layerTars = (await recursiveReaddir(fromDir)).filter(path => path.endsWith(`/layer.tar`))
 
     const moveLayer = async (layer: string) => {
       const from = path.resolve(`${fromDir}/${layer}`)
