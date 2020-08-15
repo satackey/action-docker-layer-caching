@@ -14,7 +14,7 @@ class LayerCache {
   ids: string[] = []
   unformattedSaveKey: string = ''
   restoredRootKey: string = ''
-  imagesDir: string = path.resolve(`${process.cwd()}/./.action-docker-layer-caching-docker_images`)
+  imagesDir: string = path.resolve(`${__dirname}/../.action-docker-layer-caching-docker_images`)
   enabledParallel = true
   concurrency: number = 4
 
