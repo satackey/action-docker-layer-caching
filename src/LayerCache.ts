@@ -90,10 +90,9 @@ class LayerCache {
   }
 
   private async moveLayerTarsInDir(fromDir: string, toDir: string) {
-    const fromDirTrailingSlash = fromDir.endsWith(`/`) ? fromDir : `${fromDir}/`
     const layerTars = (await recursiveReaddir(fromDir))
       .filter(path => path.endsWith(`/layer.tar`))
-      .map(path => path.replace(fromDirTrailingSlash, ``))
+      .map(path => path.replace(`${fromDir}/`, ``))
 
     const moveLayer = async (layer: string) => {
       const from = path.resolve(`${fromDir}/${layer}`)
