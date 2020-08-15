@@ -56,9 +56,6 @@ jobs:
               'ubuntu-latest',
               'windows-latest',
             ],
-            branch: [
-              context.payload.ref.replace('refs/heads/', '')
-            ],
             include: [
               {
                 inspect_image: 'test_project_scratch',
@@ -68,7 +65,9 @@ jobs:
                 inspect_image: 'hello-world',
                 prepare_command: ':',
                 build_command: 'docker pull hello-world',
-              },
+              }, {
+                branch: process.env.GITHUB_REF.replace('refs/heads/', '')
+              }
             ],
             exclude: [
               {
