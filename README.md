@@ -35,11 +35,11 @@ jobs:
     # In this step, this action saves a list of existing images,
     # the cache is created without them in the post run.
     # It also restores the cache if it exists.
-    - uses: satackey/action-docker-layer-caching@v0.0.7
+    - uses: satackey/action-docker-layer-caching@v0.0.8
 
     - run: docker-compose up --build
 
-    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.7",
+    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.8",
     # which is the process of saving the cache, will be executed.
 ```
 
@@ -61,12 +61,12 @@ jobs:
     # In this step, this action saves a list of existing images,
     # the cache is created without them in the post run.
     # It also restores the cache if it exists.
-    - uses: satackey/action-docker-layer-caching@v0.0.7
+    - uses: satackey/action-docker-layer-caching@v0.0.8
 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
-    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.7",
+    # Finally, "Post Run satackey/action-docker-layer-caching@v0.0.8",
     # which is the process of saving the cache, will be executed.
 ```
 
@@ -79,7 +79,7 @@ By default, the cache is separated by the workflow name.
 You can also set the cache key manually, like the official [actions/cache](https://github.com/actions/cache#usage) action.
 
 ```yaml
-    - uses: satackey/action-docker-layer-caching@v0.0.7
+    - uses: satackey/action-docker-layer-caching@v0.0.8
       with:
         key: foo-docker-cache-{hash}
         restore-keys: |
