@@ -102,7 +102,7 @@ jobs:
     - uses: ./action-dlc
       name: Run satackey/action-docker-layer-caching@${{ matrix.branch }}
       with:
-        key: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
+        key: docker-layer-caching-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
 
     - run: ${{ matrix.build_command }}
 
@@ -130,8 +130,8 @@ jobs:
     - uses: ./action-dlc
       name: Run satackey/action-docker-layer-caching@${{ matrix.branch }}
       with:
-        key: never-restored-docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
-        restore-keys: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
+        key: never-restored-docker-layer-caching-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
+        restore-keys: docker-layer-caching-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
         skip-save: 'true'
 
     - name: Show cached image info
