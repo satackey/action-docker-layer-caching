@@ -70,6 +70,12 @@ jobs:
                 build_command: 'docker pull hello-world',
               },
             ],
+            exclude: [
+              {
+                inspect_image: 'test_project_scratch',
+                os: 'windows-latest',
+              },
+            ],
           }
 
     outputs:
