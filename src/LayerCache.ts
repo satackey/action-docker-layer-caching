@@ -133,14 +133,15 @@ class LayerCache {
     }
   }
 
-  private async storeSingleLayerBy(id: string): Promise<number> {
-    const path = this.genSingleLayerStorePath(id)
-    const key = await this.generateSingleLayerSaveKey(id)
+  private async storeSingleLayerBy(layerId: string): Promise<number> {
+    const path = this.genSingleLayerStorePath(layerId)
+    const key = await this.generateSingleLayerSaveKey(layerId)
 
-    core.info(`Start storing layer cache: ${key}`)
+    core.info(`Start storing layer cache: ${JSON.stringify({ layerId, key })}`)
     const cacheId = await LayerCache.dismissError(cache.saveCache([path], key), LayerCache.ERROR_CACHE_ALREAD_EXISTS_STR, -1)
-    core.info(`Stored layer cache, key: ${key}, id: ${cacheId}`)
+    core.info(`Stored layer cache: ${JSON.stringify({ key, cacheId })}`)
 
+    core.debug(JSON.stringify({ log: `storeSingleLayerBy`, layerId, path, key, cacheId}))
     return cacheId
   }
 
@@ -201,9 +202,12 @@ class LayerCache {
   }
 
   private async restoreSingleLayerBy(id: string): Promise<string> {
-    core.debug(JSON.stringify({ log: `restoreSingleLayerBy`, id }))
+    const path = this.genSingleLayerStorePath(id)
+    const key = await this.recoverSingleLayerKey(id)
 
-    const result = await cache.restoreCache([this.genSingleLayerStorePath(id)], await this.recoverSingleLayerKey(id))
+    core.debug(JSON.stringify({ log: `restoreSingleLayerBy`, id, path, key }))
+
+    const result = await cache.restoreCache([path], key)
 
     if (result == null) {
       throw new Error(`${LayerCache.ERROR_LAYER_CACHE_NOT_FOUND_STR}: ${JSON.stringify({ id })}`)
