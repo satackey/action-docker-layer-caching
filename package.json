@@ -8,9 +8,11 @@
   "dependencies": {
     "@actions/cache": "^1.0.2",
     "@actions/core": "^1.2.4",
+    "@types/recursive-readdir": "^2.2.0",
     "actions-exec-listener": "^0.0.2",
     "crypto": "^1.0.1",
     "native-promise-pool": "^3.13.0",
+    "recursive-readdir": "^2.2.2",
     "string-format": "^2.0.0",
     "typescript-is": "^0.16.3"
   },

@@ -45,18 +45,18 @@ jobs:
         script: |
           return {
             inspect_image: [
-              'test_project_node',
-              'amazon/aws-cli',
+              'test_project_scratch',
+              'hello-world',
             ],
             include: [
               {
-                inspect_image: 'test_project_node',
+                inspect_image: 'test_project_scratch',
                 prepare_command: 'docker-compose -f test_project/docker-compose.yml -p test_project pull',
                 build_command: 'docker-compose -f test_project/docker-compose.yml -p test_project build',
               }, {
-                inspect_image: 'amazon/aws-cli',
+                inspect_image: 'hello-world',
                 prepare_command: ':',
-                build_command: 'docker pull amazon/aws-cli',
+                build_command: 'docker pull hello-world',
               },
             ],
           }
@@ -91,7 +91,6 @@ jobs:
       name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
       with:
         key: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
-        restore-keys: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
 
     - run: ${{ matrix.build_command }}
 
@@ -119,7 +118,7 @@ jobs:
     - uses: ./action-dlc
       name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
       with:
-        key: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
+        key: never-restored-docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
         restore-keys: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
         skip-save: 'true'
 

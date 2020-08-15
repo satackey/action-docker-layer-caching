@@ -5,41 +5,35 @@ import * as core from '@actions/core'
 import * as cache from '@actions/cache'
 import { ExecOptions } from '@actions/exec/lib/interfaces'
 import { promises as fs } from 'fs'
-import { assertManifests, Manifest, Manifests } from './Tar'
+import recursiveReaddir from 'recursive-readdir'
+import { Manifest, loadManifests, loadRawManifests } from './Tar'
 import format from 'string-format'
 import PromisePool from 'native-promise-pool'
 
 class LayerCache {
-  // repotag: string
-  ids: string[]
-  unformattedOrigianlKey: string = ''
-  restoredOriginalKey?: string
-  // tarFile: string = ''
-  imagesDir: string = path.resolve(`${process.cwd()}/./.action-docker-layer-caching-docker_images`)
+  ids: string[] = []
+  unformattedSaveKey: string = ''
+  restoredRootKey: string = ''
+  imagesDir: string = path.resolve(`${__dirname}/../.action-docker-layer-caching-docker_images`)
   enabledParallel = true
-  // unpackedTarDir: string = ''
-  // manifests: Manifests = []
   concurrency: number = 4
 
+  static ERROR_CACHE_ALREAD_EXISTS_STR = `Cache already exists`
+  static ERROR_LAYER_CACHE_NOT_FOUND_STR = `Layer cache not found`
+
   constructor(ids: string[]) {
-    // this.repotag = repotag
     this.ids = ids
   }
 
   async exec(command: string, args?: string[], options?: ExecOptions) {
-    const argsStr = args != null ? args.join(' ') : ''
-    core.startGroup(`${command} ${argsStr}`)
     const result = await exec.exec(command, args, options)
-    core.endGroup()
 
     return result
   }
 
   async store(key: string) {
-    this.unformattedOrigianlKey = key
-    // this.originalKeyToStore = format(key, {
-    //   hash: this.getIdhashesPathFriendly()
-    // })
+    this.unformattedSaveKey = key
+
     await this.saveImageAsUnpacked()
     if (this.enabledParallel) {
       await this.separateAllLayerCaches()
@@ -73,18 +67,16 @@ class LayerCache {
   }
 
   private async getManifests() {
-    const manifests = JSON.parse((await fs.readFile(`${this.getUnpackedTarDir()}/manifest.json`)).toString())
-    assertManifests(manifests)
-    return manifests
+    return loadManifests(this.getUnpackedTarDir())
   }
 
   private async storeRoot() {
-    const rootKey = this.getRootKey()
+    const rootKey = await this.generateRootSaveKey()
     const paths = [
       this.getUnpackedTarDir(),
     ]
     core.info(`Start storing root cache, key: ${rootKey}, dir: ${paths}`)
-    const cacheId = await LayerCache.dismissCacheAlreadyExistsError(cache.saveCache(paths, rootKey))
+    const cacheId = await LayerCache.dismissError(cache.saveCache(paths, rootKey), LayerCache.ERROR_CACHE_ALREAD_EXISTS_STR, -1)
     core.info(`Stored root cache, key: ${rootKey}, id: ${cacheId}`)
     return cacheId !== -1 ? cacheId : undefined
   }
@@ -98,7 +90,10 @@ class LayerCache {
   }
 
   private async moveLayerTarsInDir(fromDir: string, toDir: string) {
-    const layerTars = (await exec.exec(`find . -name layer.tar`, [], { cwd: fromDir, silent: true })).stdoutStr.split(`\n`).filter(tar => tar !== '')
+    const layerTars = (await recursiveReaddir(fromDir))
+      .filter(path => path.endsWith(`/layer.tar`))
+      .map(path => path.replace(`${fromDir}/`, ``))
+
     const moveLayer = async (layer: string) => {
       const from = path.resolve(`${fromDir}/${layer}`)
       const to = path.resolve(`${toDir}/${layer}`)
@@ -122,29 +117,28 @@ class LayerCache {
     return result
   }
 
-  static async dismissCacheAlreadyExistsError(promise: Promise<number>): Promise<number> {
-    let result = -1
+  static async dismissError<T>(promise: Promise<T>, dismissStr: string, defaultResult: T): Promise<T> {
     try {
-      result = await promise
-      return result
+      return await promise
     } catch (e) {
       core.debug(`catch error: ${e.toString()}`)
-      if (typeof e.message !== 'string' || !e.message.includes(`Cache already exists`)) {
+      if (typeof e.message !== 'string' || !e.message.includes(dismissStr)) {
         core.error(`Unexpected error: ${e.toString()}`)
         throw e
       }
-      core.info(`info: Cache already exists: ${e.toString()}`)
+
+      core.info(`${dismissStr}: ${e.toString()}`)
       core.debug(e)
-      return result
+      return defaultResult
     }
   }
 
   private async storeSingleLayerBy(id: string): Promise<number> {
     const path = this.genSingleLayerStorePath(id)
-    const key = this.genSingleLayerStoreKey(id)
+    const key = await this.generateSingleLayerSaveKey(id)
 
     core.info(`Start storing layer cache: ${key}`)
-    const cacheId = await LayerCache.dismissCacheAlreadyExistsError(cache.saveCache([path], key))
+    const cacheId = await LayerCache.dismissError(cache.saveCache([path], key), LayerCache.ERROR_CACHE_ALREAD_EXISTS_STR, -1)
     core.info(`Stored layer cache, key: ${key}, id: ${cacheId}`)
 
     return cacheId
@@ -152,10 +146,8 @@ class LayerCache {
 
   // ---
 
-  async restore(key: string, restoreKeys?: string[]) {
-    this.unformattedOrigianlKey = key
-    // const restoreKeysIncludedRootKey = [key, ...(restoreKeys !== undefined ? restoreKeys : [])]
-    const restoredCacheKey = await this.restoreRoot(restoreKeys)
+  async restore(primaryKey: string, restoreKeys?: string[]) {
+    const restoredCacheKey = await this.restoreRoot(primaryKey, restoreKeys)
     if (restoredCacheKey === undefined) {
       core.info(`Root cache could not be found. aborting.`)
       return undefined
@@ -172,40 +164,49 @@ class LayerCache {
     return restoredCacheKey
   }
 
-  private async restoreRoot(restoreKeys?: string[]): Promise<string | undefined> {
-    core.debug(`Trying to restore root cache: ${ JSON.stringify({ primaryKey: this.getRootKey(), restoreKeys, dir: this.getUnpackedTarDir() }) }`)
-    const restoredCacheKeyMayUndefined = await cache.restoreCache([this.getUnpackedTarDir()], this.getRootKey(), restoreKeys)
-    core.debug(`restoredCacheKeyMayUndefined: ${restoredCacheKeyMayUndefined}`)
-    if (restoredCacheKeyMayUndefined === undefined) {
+  private async restoreRoot(primaryKey: string, restoreKeys?: string[]): Promise<string | undefined> {
+    core.debug(`Trying to restore root cache: ${ JSON.stringify({ restoreKeys, dir: this.getUnpackedTarDir() }) }`)
+    const restoredRootKey = await cache.restoreCache([this.getUnpackedTarDir()], primaryKey, restoreKeys)
+    core.debug(`restoredRootKey: ${restoredRootKey}`)
+    if (restoredRootKey === undefined) {
       return undefined
     }
-    this.restoredOriginalKey = restoredCacheKeyMayUndefined.replace(/-root$/, '')
-    return this.restoredOriginalKey
+    this.restoredRootKey = restoredRootKey
+
+    return restoredRootKey
   }
 
-  private async restoreLayers() {
+  private async restoreLayers(): Promise<boolean> {
     const pool = new PromisePool(this.concurrency)
 
-    const restoredLayerKeysThatMayContainUndefined = await Promise.all(
-      (await this.getLayerIds()).map(
-        layerId => {
-          return pool.open(() => this.restoreSingleLayerBy(layerId))
-        }
-      )
+    const tasks = (await this.getLayerIds()).map(
+      layerId => pool.open(() => this.restoreSingleLayerBy(layerId))
     )
 
-    core.debug(JSON.stringify({ log: `restoreLayers`, restoredLayerKeysThatMayContainUndefined }))
-    const FailedToRestore = (restored: string | undefined) => restored === undefined
-    return restoredLayerKeysThatMayContainUndefined.filter(FailedToRestore).length === 0
+    try {
+      await Promise.all(tasks)
+    } catch (e) {
+      if (typeof e.message === `string` && e.message.includes(LayerCache.ERROR_LAYER_CACHE_NOT_FOUND_STR)) {
+        core.info(e.message)
+
+        // Avoid UnhandledPromiseRejectionWarning
+        tasks.map(task => task.catch(core.info))
+
+        return false
+      }
+      throw e
+    }
+
+    return true
   }
 
   private async restoreSingleLayerBy(id: string): Promise<string> {
     core.debug(JSON.stringify({ log: `restoreSingleLayerBy`, id }))
 
-    const result = await cache.restoreCache([this.genSingleLayerStorePath(id)], this.genSingleLayerStoreKey(id))
+    const result = await cache.restoreCache([this.genSingleLayerStorePath(id)], await this.recoverSingleLayerKey(id))
 
     if (result == null) {
-      throw new Error(`Layer cache not found: ${JSON.stringify({ id })}`)
+      throw new Error(`${LayerCache.ERROR_LAYER_CACHE_NOT_FOUND_STR}: ${JSON.stringify({ id })}`)
     }
 
     return result
@@ -241,31 +242,44 @@ class LayerCache {
     return 'image'
   }
 
-  getIdhashesPathFriendly(): string {
-    const result = crypto.createHash(`sha256`).update(this.ids.join(`-`), `utf8`).digest(`hex`)
-    core.debug(JSON.stringify({ log: `getIdhashesPathFriendly`, result }))
-    return result
-  }
-
-  getRootKey(): string {
-    return `${this.getFormattedOriginalCacheKey()}-root`
-  }
-
   genSingleLayerStorePath(id: string) {
     return `${this.getLayerCachesDir()}/${id}/layer.tar`
   }
 
-  genSingleLayerStoreKey(id: string) {
-    const singleLayerStoreKey = this.getFormattedOriginalCacheKey(id)
-    core.debug(JSON.stringify({ log: `genSingleLayerStoreKey`, singleLayerStoreKey, id }))
-    return `layer-${singleLayerStoreKey}`
+  async generateRootHashFromManifest(): Promise<string> {
+    const manifest = await loadRawManifests(this.getUnpackedTarDir())
+    return crypto.createHash(`sha256`).update(manifest, `utf8`).digest(`hex`)
   }
 
-  getFormattedOriginalCacheKey(hashThatMayBeSpecified?: string) {
-    const hash = hashThatMayBeSpecified !== undefined ? hashThatMayBeSpecified : this.getIdhashesPathFriendly()
-    const result = format(this.unformattedOrigianlKey, { hash })
-    core.debug(JSON.stringify({ log: `getFormattedOriginalCacheKey`, hash, hashThatMayBeSpecified, result }))
+  async generateRootSaveKey(): Promise<string> {
+    const rootHash = await this.generateRootHashFromManifest()
+    const formatted = await this.getFormattedSaveKey(rootHash)
+    core.debug(JSON.stringify({ log: `generateRootSaveKey`, rootHash, formatted }))
+    return `${formatted}-root`
+  }
+
+  async generateSingleLayerSaveKey(id: string) {
+    const formatted = await this.getFormattedSaveKey(id)
+    core.debug(JSON.stringify({ log: `generateSingleLayerSaveKey`, formatted, id }))
+    return `layer-${formatted}`
+  }
+  
+  async recoverSingleLayerKey(id: string) {
+    const unformatted = await this.recoverUnformattedSaveKey()
+    return format(`layer-${unformatted}`, { hash: id })
+  }
+
+  async getFormattedSaveKey(hash: string) {
+    const result = format(this.unformattedSaveKey, { hash })
+    core.debug(JSON.stringify({ log: `getFormattedSaveKey`, hash, result }))
     return result
+  }
+
+  async recoverUnformattedSaveKey() {
+    const hash = await this.generateRootHashFromManifest()
+    core.debug(JSON.stringify({ log: `recoverUnformattedSaveKey`, hash}))
+
+    return this.restoredRootKey.replace(hash, `{hash}`).replace(/-root$/, ``)
   }
 
   async getLayerTarFiles(): Promise<string[]> {

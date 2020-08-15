@@ -4,11 +4,12 @@ import { LayerCache } from './src/LayerCache'
 import {  ImageDetector } from './src/ImageDetector'
 
 const main = async () => {
-  // const repotag = core.getInput(`repotag`, { required: true })
   const primaryKey = core.getInput(`key`, { required: true })
   const restoreKeys = core.getInput(`restore-keys`, { required: false }).split(`\n`).filter(key => key !== ``)
 
-  core.saveState(`already-existing-images`, JSON.stringify(await new ImageDetector().getExistingImages()))
+  const imageDetector = new ImageDetector()
+
+  const alreadyExistingImages = await imageDetector.getExistingImages()
 
   const layerCache = new LayerCache([])
   layerCache.concurrency = parseInt(core.getInput(`concurrency`, { required: true }), 10)
@@ -16,6 +17,8 @@ const main = async () => {
   await layerCache.cleanUp()
 
   core.saveState(`restored-key`, JSON.stringify(restoredKey !== undefined ? restoredKey : ''))
+  core.saveState(`already-existing-images`, JSON.stringify(alreadyExistingImages))
+  core.saveState(`restored-images`, JSON.stringify(await imageDetector.getImagesShouldSave(alreadyExistingImages)))
 }
 
 main().catch(e => {
