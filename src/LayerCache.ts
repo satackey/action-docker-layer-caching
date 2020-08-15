@@ -178,8 +178,9 @@ class LayerCache {
   }
 
   private async restoreLayers(): Promise<boolean> {
-    const pool = new PromisePool(this.concurrency)
 
+    
+    const pool = new PromisePool(this.concurrency)
     const tasks = (await this.getLayerIds()).map(
       layerId => pool.open(() => this.restoreSingleLayerBy(layerId))
     )
@@ -204,9 +205,11 @@ class LayerCache {
   private async restoreSingleLayerBy(id: string): Promise<string> {
     const path = this.genSingleLayerStorePath(id)
     const key = await this.recoverSingleLayerKey(id)
+    const dir = path.replace(/[^/\\]+$/, ``)
 
-    core.debug(JSON.stringify({ log: `restoreSingleLayerBy`, id, path, key }))
+    core.debug(JSON.stringify({ log: `restoreSingleLayerBy`, id, path, dir, key }))
 
+    await fs.mkdir(dir, { recursive: true })
     const result = await cache.restoreCache([path], key)
 
     if (result == null) {
@@ -247,7 +250,7 @@ class LayerCache {
   }
 
   genSingleLayerStorePath(id: string) {
-    return `${this.getLayerCachesDir()}/${id}/layer.tar`
+    return path.resolve(`${this.getLayerCachesDir()}/${id}/layer.tar`)
   }
 
   async generateRootHashFromManifest(): Promise<string> {
