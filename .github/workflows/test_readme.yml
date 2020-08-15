@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v2
     - run: docker-compose -f test_project/docker-compose.yml -p test_project pull
 
-    - uses: satackey/action-docker-layer-caching@v0.0.5
+    - uses: satackey/action-docker-layer-caching@v0.0.6
       with:
         key: docker-layer-caching-${{ github.workflow }}-${{ github.event_name }}-{hash}
         restore-keys: docker-layer-caching-${{ github.workflow }}-${{ github.event_name }}-
@@ -34,7 +34,7 @@ jobs:
     - uses: actions/checkout@v2
     - run: docker-compose -f test_project/docker-compose.yml -p test_project pull
 
-    - uses: satackey/action-docker-layer-caching@v0.0.5
+    - uses: satackey/action-docker-layer-caching@v0.0.6
       with:
         key: docker-layer-caching-${{ github.workflow }}-${{ github.event_name }}-{hash}
         restore-keys: docker-layer-caching-${{ github.workflow }}-${{ github.event_name }}-
