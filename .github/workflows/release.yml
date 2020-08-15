@@ -121,6 +121,7 @@ jobs:
       with:
         key: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
         restore-keys: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
+        skip-save: 'true'
 
     - name: Show cached image info
       run: docker inspect ${{ matrix.inspect_image }}
