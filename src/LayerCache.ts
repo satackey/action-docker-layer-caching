@@ -49,8 +49,8 @@ class LayerCache {
   }
 
   private async saveImageAsUnpacked() {
-    await this.exec('mkdir -p', [this.getSavedImageTarDir()], { silent: true })
-    await this.exec(`sh -c`, [`docker save '${(await this.makeRepotagsDockerSaveArgReady(this.ids)).join(`' '`)}' | tar xf - -C ${this.getSavedImageTarDir()}`])
+    await fs.mkdir(this.getSavedImageTarDir(), { recursive: true })
+    await this.exec(`sh -c`, [`docker save '${(await this.makeRepotagsDockerSaveArgReady(this.ids)).join(`' '`)}' | tar xf - -C .`], { cwd: this.getSavedImageTarDir() })
   }
 
   private async makeRepotagsDockerSaveArgReady(repotags: string[]): Promise<string[]> {
@@ -133,14 +133,15 @@ class LayerCache {
     }
   }
 
-  private async storeSingleLayerBy(id: string): Promise<number> {
-    const path = this.genSingleLayerStorePath(id)
-    const key = await this.generateSingleLayerSaveKey(id)
+  private async storeSingleLayerBy(layerId: string): Promise<number> {
+    const path = this.genSingleLayerStorePath(layerId)
+    const key = await this.generateSingleLayerSaveKey(layerId)
 
-    core.info(`Start storing layer cache: ${key}`)
+    core.info(`Start storing layer cache: ${JSON.stringify({ layerId, key })}`)
     const cacheId = await LayerCache.dismissError(cache.saveCache([path], key), LayerCache.ERROR_CACHE_ALREAD_EXISTS_STR, -1)
-    core.info(`Stored layer cache, key: ${key}, id: ${cacheId}`)
+    core.info(`Stored layer cache: ${JSON.stringify({ key, cacheId })}`)
 
+    core.debug(JSON.stringify({ log: `storeSingleLayerBy`, layerId, path, key, cacheId}))
     return cacheId
   }
 
@@ -177,8 +178,9 @@ class LayerCache {
   }
 
   private async restoreLayers(): Promise<boolean> {
-    const pool = new PromisePool(this.concurrency)
 
+    
+    const pool = new PromisePool(this.concurrency)
     const tasks = (await this.getLayerIds()).map(
       layerId => pool.open(() => this.restoreSingleLayerBy(layerId))
     )
@@ -201,9 +203,14 @@ class LayerCache {
   }
 
   private async restoreSingleLayerBy(id: string): Promise<string> {
-    core.debug(JSON.stringify({ log: `restoreSingleLayerBy`, id }))
+    const path = this.genSingleLayerStorePath(id)
+    const key = await this.recoverSingleLayerKey(id)
+    const dir = path.replace(/[^/\\]+$/, ``)
 
-    const result = await cache.restoreCache([this.genSingleLayerStorePath(id)], await this.recoverSingleLayerKey(id))
+    core.debug(JSON.stringify({ log: `restoreSingleLayerBy`, id, path, dir, key }))
+
+    await fs.mkdir(dir, { recursive: true })
+    const result = await cache.restoreCache([path], key)
 
     if (result == null) {
       throw new Error(`${LayerCache.ERROR_LAYER_CACHE_NOT_FOUND_STR}: ${JSON.stringify({ id })}`)
@@ -243,7 +250,7 @@ class LayerCache {
   }
 
   genSingleLayerStorePath(id: string) {
-    return `${this.getLayerCachesDir()}/${id}/layer.tar`
+    return path.resolve(`${this.getLayerCachesDir()}/${id}/layer.tar`)
   }
 
   async generateRootHashFromManifest(): Promise<string> {

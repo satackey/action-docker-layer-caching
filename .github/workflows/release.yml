@@ -7,6 +7,10 @@ on:
   pull_request:
   delete:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -48,6 +52,10 @@ jobs:
               'test_project_scratch',
               'hello-world',
             ],
+            os: [
+              'ubuntu-latest',
+              'windows-latest',
+            ],
             include: [
               {
                 inspect_image: 'test_project_scratch',
@@ -57,6 +65,14 @@ jobs:
                 inspect_image: 'hello-world',
                 prepare_command: ':',
                 build_command: 'docker pull hello-world',
+              }, {
+                branch: process.env.GITHUB_REF.replace('refs/heads/', '')
+              }
+            ],
+            exclude: [
+              {
+                inspect_image: 'test_project_scratch',
+                os: 'windows-latest',
               },
             ],
           }
@@ -69,18 +85,13 @@ jobs:
     needs: build
     strategy:
       matrix: ${{ fromJSON(needs.build.outputs.matrix) }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
 
     - run: ${{ matrix.prepare_command }}
 
-    - name: Extract
-      id: extract
-      run: |
-        echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
-    
     - name: Download action
       uses: actions/download-artifact@v2
       with:
@@ -88,9 +99,9 @@ jobs:
         path: action-dlc
 
     - uses: ./action-dlc
-      name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
+      name: Run satackey/action-docker-layer-caching@${{ matrix.branch }}
       with:
-        key: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
+        key: docker-layer-caching-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
 
     - run: ${{ matrix.build_command }}
 
@@ -98,7 +109,8 @@ jobs:
     needs: [build, test_saving]
     strategy:
       matrix: ${{ fromJSON(needs.build.outputs.matrix) }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
     steps:
     - uses: actions/checkout@v2
 
@@ -116,10 +128,10 @@ jobs:
         path: action-dlc
 
     - uses: ./action-dlc
-      name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
+      name: Run satackey/action-docker-layer-caching@${{ matrix.branch }}
       with:
-        key: never-restored-docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
-        restore-keys: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
+        key: never-restored-docker-layer-caching-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
+        restore-keys: docker-layer-caching-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
         skip-save: 'true'
 
     - name: Show cached image info
