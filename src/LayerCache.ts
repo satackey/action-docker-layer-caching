@@ -147,8 +147,8 @@ class LayerCache {
 
   // ---
 
-  async restore(key: string, restoreKeys?: string[]) {
-    const restoredCacheKey = await this.restoreRoot(restoreKeys)
+  async restore(primaryKey: string, restoreKeys?: string[]) {
+    const restoredCacheKey = await this.restoreRoot(primaryKey, restoreKeys)
     if (restoredCacheKey === undefined) {
       core.info(`Root cache could not be found. aborting.`)
       return undefined
@@ -165,9 +165,9 @@ class LayerCache {
     return restoredCacheKey
   }
 
-  private async restoreRoot(restoreKeys?: string[]): Promise<string | undefined> {
+  private async restoreRoot(primaryKey: string, restoreKeys?: string[]): Promise<string | undefined> {
     core.debug(`Trying to restore root cache: ${ JSON.stringify({ restoreKeys, dir: this.getUnpackedTarDir() }) }`)
-    const restoredRootKey = await cache.restoreCache([this.getUnpackedTarDir()], ``, restoreKeys)
+    const restoredRootKey = await cache.restoreCache([this.getUnpackedTarDir()], primaryKey, restoreKeys)
     core.debug(`restoredRootKey: ${restoredRootKey}`)
     if (restoredRootKey === undefined) {
       return undefined
