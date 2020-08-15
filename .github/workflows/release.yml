@@ -7,6 +7,10 @@ on:
   pull_request:
   delete:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest
