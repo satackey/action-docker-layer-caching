@@ -1,7 +1,0 @@
-version: '3'
-
-services:
-  scratch:
-    build: '.'
-  hello_world:
-    image: hello-world
