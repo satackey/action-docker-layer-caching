@@ -26,6 +26,12 @@ const main = async () => {
     return
   }
 
+  const imagesToSave = await imageDetector.getImagesShouldSave(alreadyExistingImages)
+  if (imagesToSave.length < 1) {
+    core.info(`There is no image to save.`)
+    return
+  }
+
   const layerCache = new LayerCache(await imageDetector.getImagesShouldSave(alreadyExistingImages))
   layerCache.concurrency = parseInt(core.getInput(`concurrency`, { required: true }), 10)
 
