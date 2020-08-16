@@ -51,6 +51,7 @@ jobs:
             inspect_image: [
               'test_project_scratch',
               'hello-world',
+              'nothing'
             ],
             os: [
               'ubuntu-latest',
@@ -65,6 +66,16 @@ jobs:
                 inspect_image: 'hello-world',
                 prepare_command: ':',
                 build_command: 'docker pull hello-world',
+              }, {
+                inspect_image: 'nothing',
+                os: 'ubuntu-latest',
+                prepare_command: 'docker tag node:12 nothing',
+                build_command: ':',
+              }, {
+                inspect_image: 'nothing',
+                os: 'windows-latest',
+                prepare_command: 'docker tag mcr.microsoft.com/windows/nanoserver:1809 nothing',
+                build_command: ':',
               }, {
                 branch: process.env.GITHUB_REF.replace('refs/heads/', '')
               }
