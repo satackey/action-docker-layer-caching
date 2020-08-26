@@ -383,7 +383,7 @@ reflect-metadata@>=0.1.12:
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.13.tgz#67ae3ca57c972a2aa1642b10fe363fe32d49dc08"
   integrity sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
 
-resolve@^1.9.0:
+resolve@>=1.9.0:
   version "1.17.0"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.17.0.tgz#b25941b54968231cc2d1bb76a79cb7f2c0bf8444"
   integrity sha512-ic+7JYiV8Vi2yzQGFWOkiZD5Z9z7O2Zhm9XMaTxdJExKasieFCr+yXZ/WmXsckHiKl12ar0y6XiXDx3m4RHn1w==
@@ -464,12 +464,12 @@ tsutils@^3.17.1:
   dependencies:
     tslib "^1.8.1"
 
-ttypescript@^1.5.10:
-  version "1.5.10"
-  resolved "https://registry.yarnpkg.com/ttypescript/-/ttypescript-1.5.10.tgz#5045083a91cf09a735ecc95d4711c1f3b83f2059"
-  integrity sha512-Hk7TRej1hM+p+Fo+Pyb/XK9pe9CAt3Sh5n5YRutxFS8hUgkh2u1Vd2K40kMcNP3WYhiVFBMqXwM/2E8O95Ep6g==
+ttypescript@^1.5.11:
+  version "1.5.11"
+  resolved "https://registry.yarnpkg.com/ttypescript/-/ttypescript-1.5.11.tgz#198a065d01f5541e976bc3e12764ff3d48fbcc80"
+  integrity sha512-sN7WE3Gnty0Wbs+AfSeXOaG2zYWw0/ghtlGftutidgwaZwEC8/Lg6yHiYFlqc6DEYynxrRPvU7UkNloygdCQVQ==
   dependencies:
-    resolve "^1.9.0"
+    resolve ">=1.9.0"
 
 tunnel@0.0.6, tunnel@^0.0.6:
   version "0.0.6"

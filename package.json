@@ -21,7 +21,7 @@
     "@types/string-format": "^2.0.0",
     "@zeit/ncc": "^0.22.3",
     "ts-node": "^8.10.2",
-    "ttypescript": "^1.5.10",
+    "ttypescript": "^1.5.11",
     "typescript": "^3.9.7"
   }
 }
