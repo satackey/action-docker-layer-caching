@@ -7,7 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/cache": "^1.0.2",
-    "@actions/core": "^1.2.4",
+    "@actions/core": "^1.2.5",
     "@types/recursive-readdir": "^2.2.0",
     "actions-exec-listener": "^0.0.2",
     "crypto": "^1.0.1",
