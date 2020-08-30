@@ -36,6 +36,8 @@ jobs:
     # the cache is created without them in the post run.
     # It also restores the cache if it exists.
     - uses: satackey/action-docker-layer-caching@v0.0.8
+      # Ignore the failure of a step and avoid terminating the job.
+      continue-on-error: true
 
     - run: docker-compose up --build
 
@@ -62,6 +64,8 @@ jobs:
     # the cache is created without them in the post run.
     # It also restores the cache if it exists.
     - uses: satackey/action-docker-layer-caching@v0.0.8
+      # Ignore the failure of a step and avoid terminating the job.
+      continue-on-error: true
 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
@@ -80,6 +84,8 @@ You can also set the cache key manually, like the official [actions/cache](https
 
 ```yaml
     - uses: satackey/action-docker-layer-caching@v0.0.8
+      # Ignore the failure of a step and avoid terminating the job.
+      continue-on-error: true
       with:
         key: foo-docker-cache-{hash}
         restore-keys: |
