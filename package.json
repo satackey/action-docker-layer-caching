@@ -17,7 +17,7 @@
     "typescript-is": "^0.16.3"
   },
   "devDependencies": {
-    "@types/node": "^14.11.1",
+    "@types/node": "^14.11.2",
     "@types/string-format": "^2.0.0",
     "@zeit/ncc": "^0.22.3",
     "ts-node": "^9.0.0",
