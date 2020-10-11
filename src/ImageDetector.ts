@@ -14,11 +14,12 @@ export class ImageDetector {
   }
 
   async getExistingImages(): Promise<string[]> {
-    const isEmptyStr = (str: string) => str !== ``
+    const isNotEmptyStr = (str: string) => str !== ``
+    const endsWithNone = (str: string) => str.endsWith('<none>')
 
     const [ids, repotags, digests] = await Promise.all(
       [this.GET_ID_COMMAND, this.GET_REPOTAGS_COMMAND, this.GET_DIGESTS_COMMAND].map(async command =>
-        (await exec.exec(`sh -c`, [command], { silent: true, listeners: { stderr: console.warn }})).stdoutStr.split(`\n`).filter(isEmptyStr)
+        (await exec.exec(`sh -c`, [command], { silent: true, listeners: { stderr: console.warn }})).stdoutStr.split(`\n`).filter((s) => isNotEmptyStr(s) && !endsWithNone(s))
       )
     )
 
