@@ -6,7 +6,7 @@ export class ImageDetector {
 
   GET_ID_COMMAND = `docker image ls -q`
   GET_REPOTAGS_COMMAND = `docker image ls --format '{{ .Repository }}:{{ .Tag }}' --filter 'dangling=false'`
-  GET_DIGEST_FROM_ID_COMMAND = `docker inspect --format='{{index .RepoDigests 0}}'`
+  GET_DIGEST_FROM_ID_COMMAND_AND_ARGS = [`docker`, `inspect`, `--format='{{index .RepoDigests 0}}'`]
 
   registerAlreadyExistedImages(images: string[]) {
     images.forEach(image => this.alreadyExistedImages.add(image))
@@ -23,7 +23,10 @@ export class ImageDetector {
 
     const digests = await Promise.all(
       ids.flatMap(
-        async (id) => (await localExec(this.GET_DIGEST_FROM_ID_COMMAND, [id]))[0]
+        async (id) => {
+          const [command, ...args] = this.GET_DIGEST_FROM_ID_COMMAND_AND_ARGS;
+          return (await localExec(command, [...args, id]))[0]
+        }
       )
     )
 
