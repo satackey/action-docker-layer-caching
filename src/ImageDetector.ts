@@ -3,7 +3,6 @@ import * as core from '@actions/core'
 
 export class ImageDetector {
   alreadyExistedImages: Set<string> = new Set([])
-  existingImages: Set<string> = new Set([])
 
   GET_ID_COMMAND = `docker image ls -q`
   GET_REPOTAGS_COMMAND = `docker image ls --format '{{ .Repository }}:{{ .Tag }}' --filter 'dangling=false'`
@@ -24,9 +23,8 @@ export class ImageDetector {
     )
 
     core.debug(JSON.stringify({ log: `getExistingImages`, ids, repotags, digests }));
-    ([...ids, ...repotags, ...digests]).forEach(image => this.existingImages.add(image))
 
-    return Array.from(this.existingImages)
+    return Array.from(new Set([...ids, ...repotags, ...digests]))
   }
 
   async getImagesShouldSave(alreadRegisteredImages: string[]): Promise<string[]> {
