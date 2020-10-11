@@ -46,16 +46,17 @@ jobs:
                 prepare_command: 'docker tag node:12 nothing',
                 build_command: ':',
               }, {
+                inspect_image: 'nothing',
+                os: 'windows-latest',
+                prepare_command: 'docker tag mcr.microsoft.com/windows/nanoserver:1809 nothing',
+                build_command: ':',
+              }, {
                 branch: process.env.GITHUB_REF.replace('refs/heads/', '')
               }
             ],
             exclude: [
               {
                 inspect_image: 'test_project_scratch',
-                os: 'windows-latest',
-              },
-              {
-                inspect_image: 'nothing',
                 os: 'windows-latest',
               },
             ],
