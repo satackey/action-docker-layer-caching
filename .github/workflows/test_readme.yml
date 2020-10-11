@@ -79,6 +79,7 @@ jobs:
     - uses: satackey/action-docker-layer-caching@use-matrix-for-test-readme-release
       with:
         key: docker-layer-caching-${{ github.workflow }}-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
+        restore-keys: ''
 
     - run: ${{ matrix.build_command }}
 
