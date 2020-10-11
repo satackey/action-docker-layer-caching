@@ -6,7 +6,7 @@ export class ImageDetector {
 
   GET_ID_COMMAND = `docker image ls -q`
   GET_REPOTAGS_COMMAND = `docker image ls --format '{{ .Repository }}:{{ .Tag }}' --filter 'dangling=false'`
-  GET_DIGESTS_COMMAND = `docker image ls --format='{{ .Repository }}@{{ .ID }}' --no-trunc`
+  GET_DIGEST_FROM_ID_COMMAND = `docker inspect --format='{{index .RepoDigests 0}}'`
 
   registerAlreadyExistedImages(images: string[]) {
     images.forEach(image => this.alreadyExistedImages.add(image))
@@ -15,10 +15,15 @@ export class ImageDetector {
   async getExistingImages(): Promise<string[]> {
     const isNotEmptyStr = (str: string) => str !== ``
     const notIncludesNone = (str: string) => str.includes('<none>')
+    const localExec = async (c: string, m?: string[]): Promise<string[]> => (await exec.exec(c, m, { silent: true, listeners: { stderr: (data) => console.warn(`${c}: ${data.toString()}`) }})).stdoutStr.split(`\n`).filter((s) => isNotEmptyStr(s) && !notIncludesNone(s))
 
-    const [ids, repotags, digests] = await Promise.all(
-      [this.GET_ID_COMMAND, this.GET_REPOTAGS_COMMAND, this.GET_DIGESTS_COMMAND].map(async command =>
-        (await exec.exec(`sh -c`, [command], { silent: true, listeners: { stderr: (data) => console.warn(`${command}: ${data.toString()}`) }})).stdoutStr.split(`\n`).filter((s) => isNotEmptyStr(s) && !notIncludesNone(s))
+    const [ids, repotags] = await Promise.all(
+      [this.GET_ID_COMMAND, this.GET_REPOTAGS_COMMAND].map((command) => localExec(command))
+    )
+
+    const digests = await Promise.all(
+      ids.flatMap(
+        async (id) => (await localExec(this.GET_DIGEST_FROM_ID_COMMAND, [id]))[0]
       )
     )
 
