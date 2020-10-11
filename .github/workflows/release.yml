@@ -7,6 +7,10 @@ on:
   pull_request:
   delete:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -45,18 +49,41 @@ jobs:
         script: |
           return {
             inspect_image: [
-              'test_project_node',
-              'amazon/aws-cli',
+              'test_project_scratch',
+              'hello-world',
+              'nothing'
+            ],
+            os: [
+              'ubuntu-latest',
+              'windows-latest',
             ],
             include: [
               {
-                inspect_image: 'test_project_node',
+                inspect_image: 'test_project_scratch',
                 prepare_command: 'docker-compose -f test_project/docker-compose.yml -p test_project pull',
                 build_command: 'docker-compose -f test_project/docker-compose.yml -p test_project build',
               }, {
-                inspect_image: 'amazon/aws-cli',
+                inspect_image: 'hello-world',
                 prepare_command: ':',
-                build_command: 'docker pull amazon/aws-cli',
+                build_command: 'docker pull hello-world',
+              }, {
+                inspect_image: 'nothing',
+                os: 'ubuntu-latest',
+                prepare_command: 'docker tag node:12 nothing',
+                build_command: ':',
+              }, {
+                inspect_image: 'nothing',
+                os: 'windows-latest',
+                prepare_command: 'docker tag mcr.microsoft.com/windows/nanoserver:1809 nothing',
+                build_command: ':',
+              }, {
+                branch: process.env.GITHUB_REF.replace('refs/heads/', '')
+              }
+            ],
+            exclude: [
+              {
+                inspect_image: 'test_project_scratch',
+                os: 'windows-latest',
               },
             ],
           }
@@ -69,18 +96,13 @@ jobs:
     needs: build
     strategy:
       matrix: ${{ fromJSON(needs.build.outputs.matrix) }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
 
     - run: ${{ matrix.prepare_command }}
 
-    - name: Extract
-      id: extract
-      run: |
-        echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
-    
     - name: Download action
       uses: actions/download-artifact@v2
       with:
@@ -88,10 +110,9 @@ jobs:
         path: action-dlc
 
     - uses: ./action-dlc
-      name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
+      name: Run satackey/action-docker-layer-caching@${{ matrix.branch }}
       with:
-        key: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
-        restore-keys: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
+        key: docker-layer-caching-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
 
     - run: ${{ matrix.build_command }}
 
@@ -99,7 +120,8 @@ jobs:
     needs: [build, test_saving]
     strategy:
       matrix: ${{ fromJSON(needs.build.outputs.matrix) }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
     steps:
     - uses: actions/checkout@v2
 
@@ -117,10 +139,11 @@ jobs:
         path: action-dlc
 
     - uses: ./action-dlc
-      name: Run satackey/action-docker-layer-caching@${{ steps.extract.outputs.branch }}
+      name: Run satackey/action-docker-layer-caching@${{ matrix.branch }}
       with:
-        key: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
-        restore-keys: docker-layer-caching-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
+        key: never-restored-docker-layer-caching-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
+        restore-keys: docker-layer-caching-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
+        skip-save: 'true'
 
     - name: Show cached image info
       run: docker inspect ${{ matrix.inspect_image }}

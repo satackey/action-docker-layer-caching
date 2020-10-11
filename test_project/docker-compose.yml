@@ -1,15 +1,7 @@
 version: '3'
 
 services:
-  tag_node:
-    build:
-      context: ../
-      dockerfile: ./test_project/tag/Dockerfile
-
-  digest_node:
-    build:
-      context: ../
-      dockerfile: ./test_project/digest/Dockerfile
-
-  mysql_pull_only:
-    image: mysql:8.0
+  scratch:
+    build: '.'
+  hello_world:
+    image: hello-world

@@ -18,7 +18,7 @@ export class ImageDetector {
 
     const [ids, repotags, digests] = await Promise.all(
       [this.GET_ID_COMMAND, this.GET_REPOTAGS_COMMAND, this.GET_DIGESTS_COMMAND].map(async command =>
-        (await exec.exec(`sh -c`, [command])).stdoutStr.split(`\n`).filter(isEmptyStr)
+        (await exec.exec(`sh -c`, [command], { silent: true })).stdoutStr.split(`\n`).filter(isEmptyStr)
       )
     )
 
@@ -28,9 +28,14 @@ export class ImageDetector {
     return Array.from(this.existingImages)
   }
 
-  getImagesShouldSave(): string[] {
-    const resultSet = new Set(this.existingImages.values())
-    this.alreadyExistedImages.forEach(image => resultSet.delete(image))
+  async getImagesShouldSave(alreadRegisteredImages: string[]): Promise<string[]> {
+    const resultSet = new Set(await this.getExistingImages())
+    alreadRegisteredImages.forEach(image => resultSet.delete(image))
     return Array.from(resultSet)
+  }
+
+  async checkIfImageHasAdded(restoredImages: string[]): Promise<boolean> {
+    const existing = await this.getExistingImages()
+    return JSON.stringify(restoredImages) === JSON.stringify(existing)
   }
 }

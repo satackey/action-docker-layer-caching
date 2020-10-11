@@ -1,23 +1,20 @@
-FROM node:12-alpine as curl-env
-RUN set -x \
-    apk update && \
-    apk add curl && \
-    mkdir -p /src && \
-    curl -o /src/install.sh -L https://yarnpkg.com/install.sh && \
-    chmod +x /src/install.sh && \
-    apk del curl
+FROM alpine AS data
+RUN date > /now1.txt
+RUN date > /now2.txt
+RUN date > /now3.txt
+RUN date > /now4.txt
+RUN date > /now5.txt
+RUN date > /now6.txt
+RUN date > /now7.txt
+RUN date > /now8.txt
+RUN date > /now9.txt
+RUN date > /now10.txt
+RUN date > /now11.txt
+RUN date > /now12.txt
+RUN date > /now13.txt
+RUN date > /now14.txt
+RUN date > /now15.txt
+RUN date > /now16.txt
 
-FROM node:12-alpine
-
-COPY --from=curl-env /src/install.sh /tmp/install.sh
-RUN set -x \
-    apk update && \
-    apk add curl && \
-    /tmp/install.sh && \
-    apk del curl
-
-WORKDIR /app
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-
-# COPY . ./
+FROM scratch
+COPY --from=data /now16.txt /data_stage_built_at.txt
