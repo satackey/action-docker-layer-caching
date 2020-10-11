@@ -19,7 +19,7 @@ export class ImageDetector {
 
     const [ids, repotags, digests] = await Promise.all(
       [this.GET_ID_COMMAND, this.GET_REPOTAGS_COMMAND, this.GET_DIGESTS_COMMAND].map(async command =>
-        (await exec.exec(`sh -c`, [command], { silent: true, listeners: { stderr: console.warn }})).stdoutStr.split(`\n`).filter((s) => isNotEmptyStr(s) && !endsWithNone(s))
+        (await exec.exec(`sh -c`, [command], { silent: true, listeners: { stderr: (data) => console.warn(`${command}: ${data.toString()}`) }})).stdoutStr.split(`\n`).filter((s) => isNotEmptyStr(s) && !endsWithNone(s))
       )
     )
 

@@ -61,7 +61,8 @@ class LayerCache {
   }
 
   private async getAllImageIdsFrom(repotag: string): Promise<string[]> {
-    const { stdoutStr: rawHistoryIds } = await this.exec(`docker history -q`, [repotag], { silent: true, listeners: { stderr: console.warn }})
+    const command = `docker history -q`
+    const { stdoutStr: rawHistoryIds } = await this.exec(command, [repotag], { silent: true, listeners: { stderr: (data) => console.warn(`${command} ${repotag}: ${data.toString()}`) }})
     const historyIds = rawHistoryIds.split(`\n`).filter(id => id !== `<missing>` && id !== ``)
     return historyIds
   }
