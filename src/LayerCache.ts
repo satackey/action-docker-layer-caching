@@ -1,5 +1,5 @@
 import * as path from 'path'
-import exec from 'actions-exec-listener'
+import * as exec from 'actions-exec-listener'
 import crypto from 'crypto'
 import * as core from '@actions/core'
 import * as cache from '@actions/cache'

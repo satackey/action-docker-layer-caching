@@ -1,4 +1,4 @@
-import exec from 'actions-exec-listener'
+import * as exec from 'actions-exec-listener'
 import * as core from '@actions/core'
 
 export class ImageDetector {
