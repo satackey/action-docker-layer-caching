@@ -15,7 +15,7 @@ export class ImageDetector {
   async getExistingImages(): Promise<string[]> {
     const isNotEmptyStr = (str: string) => str !== ``
     const notIncludesNone = (str: string) => str.includes('<none>')
-    const localExec = async (command: string, args?: string[]): Promise<string[]> => (await exec.exec('sh', ['-c', command, ...(args ?? [])], { silent: true, listeners: { stderr: (data) => console.warn(`${command} ${args?.join(' ')}: ${data.toString()}`) }})).stdoutStr.split(`\n`).filter((s) => isNotEmptyStr(s) && !notIncludesNone(s))
+    const localExec = async (command: string, args?: string[]): Promise<string[]> => (await exec.exec('sh', ['-c', `${command}, ${(args ?? []).join(' ')}`], { silent: true, listeners: { stderr: (data) => console.warn(`${command} ${args?.join(' ')}: ${data.toString()}`) }})).stdoutStr.split(`\n`).filter((s) => isNotEmptyStr(s) && !notIncludesNone(s))
 
     const [ids, repotags] = await Promise.all(
       [this.GET_ID_COMMAND, this.GET_REPOTAGS_COMMAND].map((command) => localExec(command))
