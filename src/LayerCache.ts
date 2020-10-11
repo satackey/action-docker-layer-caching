@@ -1,5 +1,5 @@
 import * as path from 'path'
-import exec from 'actions-exec-listener'
+import * as exec from 'actions-exec-listener'
 import crypto from 'crypto'
 import * as core from '@actions/core'
 import * as cache from '@actions/cache'
@@ -61,7 +61,7 @@ class LayerCache {
   }
 
   private async getAllImageIdsFrom(repotag: string): Promise<string[]> {
-    const { stdoutStr: rawHistoryIds } = await this.exec(`docker history -q`, [repotag], { silent: false })
+    const { stdoutStr: rawHistoryIds } = await this.exec(`docker history -q`, [repotag], { silent: true, listeners: { stderr: console.warn }})
     const historyIds = rawHistoryIds.split(`\n`).filter(id => id !== `<missing>` && id !== ``)
     return historyIds
   }

@@ -1,4 +1,4 @@
-import exec from 'actions-exec-listener'
+import * as exec from 'actions-exec-listener'
 import * as core from '@actions/core'
 
 export class ImageDetector {
@@ -18,7 +18,7 @@ export class ImageDetector {
 
     const [ids, repotags, digests] = await Promise.all(
       [this.GET_ID_COMMAND, this.GET_REPOTAGS_COMMAND, this.GET_DIGESTS_COMMAND].map(async command =>
-        (await exec.exec(`sh -c`, [command], { silent: true })).stdoutStr.split(`\n`).filter(isEmptyStr)
+        (await exec.exec(`sh -c`, [command], { silent: true, listeners: { stderr: console.warn }})).stdoutStr.split(`\n`).filter(isEmptyStr)
       )
     )
 
