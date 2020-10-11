@@ -2,8 +2,8 @@ name: Readme Test
 
 on:
   push: 
-    # branches:
-    # - master
+    branches:
+    - master
   schedule:
   - cron: 0 0 */3 * *
 
@@ -76,7 +76,7 @@ jobs:
 
     - run: ${{ matrix.prepare_command }}
 
-    - uses: satackey/action-docker-layer-caching@use-matrix-for-test-readme-release
+    - uses: satackey/action-docker-layer-caching@master-release
       with:
         key: docker-layer-caching-${{ github.workflow }}-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
         restore-keys: ''
@@ -94,7 +94,7 @@ jobs:
 
     - run: ${{ matrix.prepare_command }}
 
-    - uses: satackey/action-docker-layer-caching@use-matrix-for-test-readme-release
+    - uses: satackey/action-docker-layer-caching@master-release
       with:
         key: never-restored-docker-layer-caching-${{ github.workflow }}-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-{hash}
         restore-keys: docker-layer-caching-${{ github.workflow }}-${{ matrix.os }}-${{ matrix.inspect_image }}-sha:${{ github.sha }}-
