@@ -1,23 +1,7 @@
-FROM node@sha256:d0738468dfc7cedb7d260369e0546fd7ee8731cfd67136f6023d070ad9679090 as curl-env
-RUN set -x \
-    apk update && \
-    apk add curl && \
-    mkdir -p /src && \
-    curl -o /src/install.sh -L https://yarnpkg.com/install.sh && \
-    chmod +x /src/install.sh && \
-    apk del curl
+FROM alpine:latest@sha256:a15790640a6690aa1730c38cf0a440e2aa44aaca9b0e8931a9f2b0d7cc90fd65 AS data
+RUN date > /now1.txt
+RUN date > /now2.txt
+RUN date > /now3.txt
 
-FROM node@sha256:d0738468dfc7cedb7d260369e0546fd7ee8731cfd67136f6023d070ad9679090
-
-COPY --from=curl-env /src/install.sh /tmp/install.sh
-RUN set -x \
-    apk update && \
-    apk add curl && \
-    /tmp/install.sh && \
-    apk del curl
-
-WORKDIR /app
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-
-# COPY . ./
+FROM scratch
+COPY --from=data /now3.txt /data_stage_built_at.txt

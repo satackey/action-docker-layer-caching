@@ -1,7 +1,9 @@
 version: '3'
 
 services:
-  scratch:
-    build: '.'
+  tag_scratch:
+    build: tag 
+  digest_scratch:
+    build: digest
   hello_world:
     image: hello-world
