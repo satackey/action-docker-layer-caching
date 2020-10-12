@@ -4,8 +4,8 @@ import * as core from '@actions/core'
 export class ImageDetector {
   alreadyExistedImages: Set<string> = new Set([])
 
-  GET_ID_COMMAND = `docker image ls -q`
-  GET_REPOTAGS_COMMAND = `docker image ls --format '{{ .Repository }}:{{ .Tag }}' --filter 'dangling=false'`
+  GET_ID_COMMAND_AND_ARGS = [`docker`, `image`, `ls`, `-q`]
+  GET_REPOTAGS_COMMAND_AND_ARGS = [`docker`, `image`, `ls`, `--format`, `'{{ .Repository }}:{{ .Tag }}'`, `--filter`, `'dangling=false'`]
   GET_DIGEST_FROM_ID_COMMAND_AND_ARGS = [`docker`, `inspect`, `--format='{{index .RepoDigests 0}}'`]
 
   registerAlreadyExistedImages(images: string[]) {
@@ -15,20 +15,23 @@ export class ImageDetector {
   async getExistingImages(): Promise<string[]> {
     const isNotEmptyStr = (str: string) => str !== ``
     const notIncludesNone = (str: string) => str.includes('<none>')
-    const localExec = async (command: string, args?: string[]): Promise<string[]> => (await exec.exec('sh', ['-c', `${command}, ${(args ?? []).join(' ')}`], { silent: true, listeners: { stderr: (data) => console.warn(`${command} ${args?.join(' ')}: ${data.toString()}`) }})).stdoutStr.split(`\n`).filter((s) => isNotEmptyStr(s) && !notIncludesNone(s))
+    const localExec = async (commandAndArgs: string[]): Promise<string[]> => {
+      const [command, ...args] = commandAndArgs
+      return (await exec.exec(command, args, { silent: true, listeners: { stderr: (data) => console.warn(`${command} ${args?.join(' ')}: ${data.toString()}`) }})).stdoutStr.split(`\n`).filter((s) => isNotEmptyStr(s) && !notIncludesNone(s))
+    }
 
     const [ids, repotags] = await Promise.all(
-      [this.GET_ID_COMMAND, this.GET_REPOTAGS_COMMAND].map((command) => localExec(command))
+      [this.GET_ID_COMMAND_AND_ARGS, this.GET_REPOTAGS_COMMAND_AND_ARGS].map((command) => localExec(command))
     )
 
-    const digests = await Promise.all(
-      ids.flatMap(
+    const digests = (await Promise.all(
+      ids.map(
         async (id) => {
-          const [command, ...args] = this.GET_DIGEST_FROM_ID_COMMAND_AND_ARGS;
-          return (await localExec(command, [...args, id]))[0]
+          const result = (await localExec([...this.GET_DIGEST_FROM_ID_COMMAND_AND_ARGS, id]))[0]
+          return result != null ? [result] : []
         }
       )
-    )
+    )).flat()
 
     core.debug(JSON.stringify({ log: `getExistingImages`, ids, repotags, digests }));
 
