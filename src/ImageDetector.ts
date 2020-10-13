@@ -5,7 +5,7 @@ export class ImageDetector {
   alreadyExistedImages: Set<string> = new Set([])
 
   GET_ID_COMMAND_AND_ARGS = [`docker`, `image`, `ls`, `-q`]
-  GET_REPOTAGS_COMMAND_AND_ARGS = [`docker`, `image`, `ls`, `--format`, `'{{ .Repository }}:{{ .Tag }}'`, `--filter`, `dangling=false`]
+  GET_REPOTAGS_COMMAND_AND_ARGS = [`docker`, `image`, `ls`, `--format`, `{{ .Repository }}:{{ .Tag }}`, `--filter`, `dangling=false`]
   GET_DIGEST_FROM_ID_COMMAND_AND_ARGS = [`docker`, `inspect`, `--format='{{index .RepoDigests 0}}'`]
 
   registerAlreadyExistedImages(images: string[]) {
