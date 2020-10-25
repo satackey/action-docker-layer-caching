@@ -6,11 +6,11 @@
   "author": "satackey <21271711+satackey@users.noreply.github.com>",
   "license": "MIT",
   "dependencies": {
-    "@actions/cache": "^1.0.2",
+    "@actions/cache": "^1.0.3",
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
     "@types/recursive-readdir": "^2.2.0",
-    "actions-exec-listener": "0.1.0-beta",
+    "actions-exec-listener": "0.1.0",
     "crypto": "^1.0.1",
     "native-promise-pool": "^3.15.0",
     "recursive-readdir": "^2.2.2",
@@ -19,7 +19,7 @@
     "typescript-is": "^0.16.3"
   },
   "devDependencies": {
-    "@types/node": "^14.11.7",
+    "@types/node": "^14.14.2",
     "@types/string-format": "^2.0.0",
     "@zeit/ncc": "^0.22.3",
     "ts-node": "^9.0.0",

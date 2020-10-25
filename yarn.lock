@@ -2,15 +2,15 @@
 # yarn lockfile v1
 
 
-"@actions/cache@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@actions/cache/-/cache-1.0.2.tgz#a223dcc752c7f988016d28ee7232f930f85cec61"
-  integrity sha512-CzAseaJ4cKmOI58EIWUb/LfeYdM7Y25s39OEMtWAhEPrPPzrbSEjGHCLaYjJ0V8C4iojo8vBYh5B3OIJ37EiJw==
+"@actions/cache@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@actions/cache/-/cache-1.0.3.tgz#fc30090bc64abd8a0e3d6694245984a8354e6891"
+  integrity sha512-2DcdMrqbfj5LcsEYIh6ACgjb0bNMeMPP7y1a+bf/Sk0MFfkkrYRNFihkXRV6v0TNkNo0b5X38xmUguRZ5ZPLbw==
   dependencies:
     "@actions/core" "^1.2.4"
     "@actions/exec" "^1.0.1"
     "@actions/glob" "^0.1.0"
-    "@actions/http-client" "^1.0.8"
+    "@actions/http-client" "^1.0.9"
     "@actions/io" "^1.0.1"
     "@azure/ms-rest-js" "^2.0.7"
     "@azure/storage-blob" "^12.1.2"
@@ -37,10 +37,10 @@
     "@actions/core" "^1.2.0"
     minimatch "^3.0.4"
 
-"@actions/http-client@^1.0.8":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@actions/http-client/-/http-client-1.0.8.tgz#8bd76e8eca89dc8bcf619aa128eba85f7a39af45"
-  integrity sha512-G4JjJ6f9Hb3Zvejj+ewLLKLf99ZC+9v+yCxoYf9vSyH+WkzPLB2LuUtRMGNkooMqdugGBFStIKXOuvH1W+EctA==
+"@actions/http-client@^1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@actions/http-client/-/http-client-1.0.9.tgz#af1947d020043dbc6a3b4c5918892095c30ffb52"
+  integrity sha512-0O4SsJ7q+MK0ycvXPl2e6bMXV7dxAXOGjrXS1eTF9s2S401Tp6c/P3c3Joz04QefC1J6Gt942Wl2jbm3f4mLcg==
   dependencies:
     tunnel "0.0.6"
 
@@ -181,10 +181,10 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@^14.11.7":
-  version "14.11.7"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.11.7.tgz#4d9673b8331ce262628ea89d9ef3964b6c1e5489"
-  integrity sha512-hSEXknS4KiayUdZ7401J/T6eykXHJkDEipnyQMJ4/GstK4kWjbHnwXlcpvIWfPKiEH1JU96DkbzJ1nHRmpmKLw==
+"@types/node@*", "@types/node@^14.14.2":
+  version "14.14.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.2.tgz#d25295f9e4ca5989a2c610754dc02a9721235eeb"
+  integrity sha512-jeYJU2kl7hL9U5xuI/BhKPZ4vqGM/OmK6whiFAXVhlstzZhVamWhDSmHyGLIp+RVyuF9/d0dqr2P85aFj4BvJg==
 
 "@types/recursive-readdir@^2.2.0":
   version "2.2.0"
@@ -217,10 +217,10 @@ abort-controller@^3.0.0:
   dependencies:
     event-target-shim "^5.0.0"
 
-actions-exec-listener@0.1.0-beta:
-  version "0.1.0-beta"
-  resolved "https://registry.yarnpkg.com/actions-exec-listener/-/actions-exec-listener-0.1.0-beta.tgz#d66754be1b00715799a3c45956a7ebc5e31b26ca"
-  integrity sha512-Ag8T/tf0YkrLevpzLd5Zwt73yZz5Iaw7Pr44oj92sTMzegME+6ED1rIGi4q7DEtYXuSGvZbQQ2MNtzyxQzjV+w==
+actions-exec-listener@0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/actions-exec-listener/-/actions-exec-listener-0.1.0.tgz#dcd4603fd703a74379c3beabef576e13e99d74f9"
+  integrity sha512-cwhiQynvYpWAvv/pa/9f9jInHkPsfyW2yqTTELgFHnG5C9U6ltj8x3xAG4hnVBsNr3r6UK4PNYI9DQLGcW2aXw==
 
 arg@^4.1.0:
   version "4.1.3"
