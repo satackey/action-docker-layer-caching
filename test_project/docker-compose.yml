@@ -2,7 +2,7 @@ version: '3'
 
 services:
   tag_scratch:
-    build: tag 
+    build: tag
   digest_scratch:
     build: digest
   hello_world:
