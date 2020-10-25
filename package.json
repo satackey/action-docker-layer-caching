@@ -10,7 +10,7 @@
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
     "@types/recursive-readdir": "^2.2.0",
-    "actions-exec-listener": "0.1.0-beta",
+    "actions-exec-listener": "0.1.0",
     "crypto": "^1.0.1",
     "native-promise-pool": "^3.15.0",
     "recursive-readdir": "^2.2.2",

@@ -217,10 +217,10 @@ abort-controller@^3.0.0:
   dependencies:
     event-target-shim "^5.0.0"
 
-actions-exec-listener@0.1.0-beta:
-  version "0.1.0-beta"
-  resolved "https://registry.yarnpkg.com/actions-exec-listener/-/actions-exec-listener-0.1.0-beta.tgz#d66754be1b00715799a3c45956a7ebc5e31b26ca"
-  integrity sha512-Ag8T/tf0YkrLevpzLd5Zwt73yZz5Iaw7Pr44oj92sTMzegME+6ED1rIGi4q7DEtYXuSGvZbQQ2MNtzyxQzjV+w==
+actions-exec-listener@0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/actions-exec-listener/-/actions-exec-listener-0.1.0.tgz#dcd4603fd703a74379c3beabef576e13e99d74f9"
+  integrity sha512-cwhiQynvYpWAvv/pa/9f9jInHkPsfyW2yqTTELgFHnG5C9U6ltj8x3xAG4hnVBsNr3r6UK4PNYI9DQLGcW2aXw==
 
 arg@^4.1.0:
   version "4.1.3"
