@@ -12,7 +12,7 @@
     "@types/recursive-readdir": "^2.2.0",
     "actions-exec-listener": "0.1.0",
     "crypto": "^1.0.1",
-    "native-promise-pool": "^3.15.0",
+    "native-promise-pool": "^3.16.0",
     "recursive-readdir": "^2.2.2",
     "string-format": "^2.0.0",
     "typescript-is": "^0.16.3"
