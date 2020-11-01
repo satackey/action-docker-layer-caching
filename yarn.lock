@@ -334,10 +334,10 @@ minimatch@3.0.4, minimatch@^3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-native-promise-pool@^3.15.0:
-  version "3.15.0"
-  resolved "https://registry.yarnpkg.com/native-promise-pool/-/native-promise-pool-3.15.0.tgz#e9151325758a933c0dbb69d8ddecf64dc5668e57"
-  integrity sha512-6CvuQFtYTZKRWppAaSkqlg/CkIhHAPVr/VxeRzkrmLX0fKNZutIHgGUs7fumL6elEiTIWGLk2lb7jflAHLDVCA==
+native-promise-pool@^3.16.0:
+  version "3.16.0"
+  resolved "https://registry.yarnpkg.com/native-promise-pool/-/native-promise-pool-3.16.0.tgz#1819c04f91357322f339232fa3e5f103564d741b"
+  integrity sha512-lv7wMAZuGIAJor/3lb0bpAxf2cmF8bQEW1uXGaibQnoO0oLzc/cDqjVHX5FrHDhpnV7iHsG9F4U20QuxdvtC2A==
 
 nested-error-stacks@^2:
   version "2.1.0"
