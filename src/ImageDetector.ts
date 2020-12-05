@@ -17,9 +17,4 @@ export class ImageDetector {
     alreadRegisteredImages.forEach(image => resultSet.delete(image))
     return Array.from(resultSet)
   }
-
-  async checkIfImageHasAdded(restoredImages: string[]): Promise<boolean> {
-    const existing = await this.getExistingImages()
-    return JSON.stringify(restoredImages) === JSON.stringify(existing)
-  }
 }
