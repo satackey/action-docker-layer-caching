@@ -14,7 +14,7 @@ class LayerCache {
   ids: string[] = []
   unformattedSaveKey: string = ''
   restoredRootKey: string = ''
-  imagesDir: string = path.resolve(`${__dirname}/../.action-docker-layer-caching-docker_images`)
+  imagesDir: string = path.resolve(`${__dirname}/../.adlc`)
   enabledParallel = true
   concurrency: number = 4
 
@@ -178,8 +178,6 @@ class LayerCache {
   }
 
   private async restoreLayers(): Promise<boolean> {
-
-    
     const pool = new PromisePool(this.concurrency)
     const tasks = (await this.getLayerIds()).map(
       layerId => pool.open(() => this.restoreSingleLayerBy(layerId))
