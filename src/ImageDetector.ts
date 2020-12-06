@@ -4,8 +4,28 @@ import * as core from '@actions/core'
 export class ImageDetector {
   async getExistingImages(): Promise<string[]> {
     const existingSet = new Set<string>([])
-    const ids = (await exec.exec(`docker image ls -q`, [], { silent: true, listeners: { stderr: console.warn }})).stdoutStr.split(`\n`).filter(id => id !== ``)
-    const repotags = (await exec.exec(`docker`, `image ls --format {{.Repository}}:{{.Tag}} --filter dangling=false`.split(' '), { silent: true, listeners: { stderr: console.warn }})).stdoutStr.split(`\n`).filter(id => id !== ``);
+    const ids = (await exec.exec(`docker image ls -q`, [], {
+      silent: true, listeners: { stderr: data => console.warn(`docker image ls -q: ${data.toString()}`) }})
+    ).stdoutStr.split(`\n`).filter(id => id !== ``)
+
+    const repotagCommand = `docker`
+    const repotagArguments = `image ls --format {{.Repository}}:{{.Tag}} --filter dangling=false`.split(' ')
+    const repotags = (
+      await exec.exec(
+        repotagCommand,
+        repotagArguments,
+        {
+          silent: true,
+          listeners: {
+            stderr: data => console.warn(`${repotagCommand} ${repotagArguments.join(` `)}: ${data.toString()}`)
+          }
+        }
+      )
+    ).stdoutStr.split(`\n`).filter(
+      repotag => repotag !== ``
+    ).map(
+      repotag => repotag.replace(`:<none>`, ``)
+    )
     core.debug(JSON.stringify({ log: "getExistingImages", ids, repotags }));
     ([...ids, ...repotags]).forEach(image => existingSet.add(image))
     core.debug(JSON.stringify({ existingSet }))
