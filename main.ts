@@ -10,6 +10,7 @@ const main = async () => {
   const imageDetector = new ImageDetector()
 
   const alreadyExistingImages = await imageDetector.getExistingImages()
+  core.saveState(`already-existing-images`, JSON.stringify(alreadyExistingImages))
 
   const layerCache = new LayerCache([])
   layerCache.concurrency = parseInt(core.getInput(`concurrency`, { required: true }), 10)
@@ -17,11 +18,13 @@ const main = async () => {
   await layerCache.cleanUp()
 
   core.saveState(`restored-key`, JSON.stringify(restoredKey !== undefined ? restoredKey : ''))
-  core.saveState(`already-existing-images`, JSON.stringify(alreadyExistingImages))
   core.saveState(`restored-images`, JSON.stringify(await imageDetector.getImagesShouldSave(alreadyExistingImages)))
 }
 
 main().catch(e => {
   console.error(e)
   core.setFailed(e)
+
+  core.saveState(`restored-key`, JSON.stringify(``))
+  core.saveState(`restored-images`, JSON.stringify([]))
 })
