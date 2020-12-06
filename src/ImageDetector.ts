@@ -5,7 +5,7 @@ export class ImageDetector {
   async getExistingImages(): Promise<string[]> {
     const existingSet = new Set<string>([])
     const ids = (await exec.exec(`docker image ls -q`, [], {
-      silent: true, listeners: { stderr: data => console.warn(`docker image ls -q: ${data.toString()}`) }})
+      listeners: { stderr: data => console.warn(`docker image ls -q: ${data.toString()}`) }})
     ).stdoutStr.split(`\n`).filter(id => id !== ``)
 
     const repotagCommand = `docker`
@@ -15,7 +15,6 @@ export class ImageDetector {
         repotagCommand,
         repotagArguments,
         {
-          silent: true,
           listeners: {
             stderr: data => console.warn(`${repotagCommand} ${repotagArguments.join(` `)}: ${data.toString()}`)
           }
