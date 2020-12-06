@@ -21,10 +21,9 @@ export class ImageDetector {
         }
       )
     ).stdoutStr.split(`\n`).filter(
-      repotag => repotag !== ``
-    ).map(
-      repotag => repotag.replace(`:<none>`, ``)
+      repotag => repotag !== `` || !repotag.endsWith(`:<none>`)
     )
+
     core.debug(JSON.stringify({ log: "getExistingImages", ids, repotags }));
     ([...ids, ...repotags]).forEach(image => existingSet.add(image))
     core.debug(JSON.stringify({ existingSet }))
