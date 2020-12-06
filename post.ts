@@ -21,17 +21,15 @@ const main = async () => {
   assertType<string[]>(restoredImages)
 
   const imageDetector = new ImageDetector()
-  if (await imageDetector.checkIfImageHasAdded(restoredImages)) {
-    core.info(`Key ${restoredKey} already exists, not saving cache.`)
-    return
-  }
 
-  const imagesToSave = await imageDetector.getImagesShouldSave(alreadyExistingImages)
-  if (imagesToSave.length < 1) {
+  const existingAndRestoredImages = alreadyExistingImages.concat(restoredImages)
+  const newImages = await imageDetector.getImagesShouldSave(existingAndRestoredImages)
+  if (newImages.length < 1) {
     core.info(`There is no image to save.`)
     return
   }
 
+  const imagesToSave = await imageDetector.getImagesShouldSave(alreadyExistingImages)
   const layerCache = new LayerCache(imagesToSave)
   layerCache.concurrency = parseInt(core.getInput(`concurrency`, { required: true }), 10)
 
