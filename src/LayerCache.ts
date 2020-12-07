@@ -18,7 +18,7 @@ class LayerCache {
   enabledParallel = true
   concurrency: number = 4
 
-  static ERROR_CACHE_ALREAD_EXISTS_STR = `Cache already exists`
+  static ERROR_CACHE_ALREAD_EXISTS_STR = `Unable to reserve cache with key`
   static ERROR_LAYER_CACHE_NOT_FOUND_STR = `Layer cache not found`
 
   constructor(ids: string[]) {
