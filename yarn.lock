@@ -480,10 +480,10 @@ tunnel@0.0.6, tunnel@^0.0.6:
   resolved "https://registry.yarnpkg.com/tunnel/-/tunnel-0.0.6.tgz#72f1314b34a5b192db012324df2cc587ca47f92c"
   integrity sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==
 
-typescript-is@^0.17.1:
-  version "0.17.1"
-  resolved "https://registry.yarnpkg.com/typescript-is/-/typescript-is-0.17.1.tgz#d1308dc9a318cc800fc86ec4843a4c8f853a17f7"
-  integrity sha512-RIz2hSJO5LPh5URMMf+5BTES+kfggk47qQ+Jez0Vg02LYT499OHsHr3V+GUsmvrkWQKd3Jgu6qo3C9Jz2N4wLQ==
+typescript-is@^0.18.2:
+  version "0.18.2"
+  resolved "https://registry.yarnpkg.com/typescript-is/-/typescript-is-0.18.2.tgz#5b46304051666777be4cb6dd658fb5b528a37551"
+  integrity sha512-TXgcmHLbuYaKtwyGy/v+oFWi9sIlEUSMcHSuRbIH7OtUuaMP6/bOPwOMDuEVRtGQ62Yx1XMdxFGbax81nXDKjg==
   dependencies:
     nested-error-stacks "^2"
     tsutils "^3.17.1"
