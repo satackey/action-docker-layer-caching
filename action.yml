@@ -10,6 +10,10 @@ inputs:
     description: An explicit key for restoring and saving the cache
     required: true
     default: docker-layer-caching-${{ github.workflow }}-{hash}
+  container:
+    description: Docker or Podman
+    required: false
+    default: "Docker"
   restore-keys:
     description: An ordered list of keys to use for restoring the cache if no cache hit occurred for key
     required: false
@@ -17,11 +21,11 @@ inputs:
   concurrency:
     description: The number of concurrency when restoring and saving layers
     required: true
-    default: '4'
+    default: "4"
   skip-save:
     description: Skip saving layers in the post step
     required: false
-    default: 'false'
+    default: "false"
 
 runs:
   using: node12
