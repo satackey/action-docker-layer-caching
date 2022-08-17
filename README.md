@@ -93,3 +93,8 @@ You can also set the cache key manually, like the official [actions/cache](https
 ```
 
 **Note: You must include `{hash}` in the `key` input.** (`{hash}` is replaced by the hash value of the docker image when the action is executed.)
+
+
+### Infrastructure model
+
+![Infrastructure model](.infragenie/infrastructure_model.png)
