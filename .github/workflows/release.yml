@@ -26,14 +26,14 @@ jobs:
       id: info
       run: |
         if [ '${{ github.event_name }}' = 'pull_request' ]; then
-          echo '::set-output name=commit_message::'
+          echo "commit_message=" >> $GITHUB_ENV
           exit 0
         fi
-        echo '::set-output name=commit_message::[auto]'
+        echo "commit_message=[auto]" >> $GITHUB_ENV
 
     - uses: satackey/push-prebuilt-action@v0.2.0-beta3
       with:
-        commit-message: ${{ steps.info.outputs.commit_message }}
+        commit-message: ${{ env.commit_message }}
         push-branch: '{branch}-release'
 
     - uses: actions/upload-artifact@v2
@@ -127,10 +127,11 @@ jobs:
 
     - run: ${{ matrix.prepare_command }}
 
-    - name: Extract
-      id: extract
-      run: |
-        echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
+    # FIXME: I don't think this is used? Looks like syntax for another build system?
+    # - name: Extract
+    #   id: extract
+    #   run: |
+    #     echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
 
     - name: Download action
       uses: actions/download-artifact@v2
@@ -149,8 +150,7 @@ jobs:
       run: docker inspect ${{ matrix.inspect_image }}
 
     - name: Get cached image ID
-      run: echo ::set-output name=id::$(docker image ls -q ${{ matrix.inspect_image }})
-      id: cached
+      run: echo "CACHED_ID=$(docker image ls -q ${{ matrix.inspect_image }})" >> $GITHUB_ENV
 
     - run: ${{ matrix.build_command }}
 
@@ -158,12 +158,11 @@ jobs:
       run: docker inspect ${{ matrix.inspect_image }}
 
     - name: Show built image ID
-      run: echo ::set-output name=id::$(docker image ls -q ${{ matrix.inspect_image }})
-      id: latest
+      run: echo "LATEST_ID=$(docker image ls -q ${{ matrix.inspect_image }})" >> $GITHUB_ENV
 
     - name: Compare cached ID and after build ID
       run: |
-        if [ ! '${{ steps.cached.outputs.id }}' = '${{ steps.latest.outputs.id }}' ];then
+        if [ ! '${{ env.CACHED_ID }}' = '${{ env.LATEST_ID }}' ];then
           echo cached != latest
           exit 1
         fi
