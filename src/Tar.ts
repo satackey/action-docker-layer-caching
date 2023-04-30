@@ -1,4 +1,4 @@
-import { assertType } from 'typescript-is' 
+import { assert } from 'typia' 
 import { promises as fs } from 'fs'
 import * as path from 'path'
 
@@ -11,7 +11,7 @@ export interface Manifest {
 export type Manifests = Manifest[]
 
 export function assertManifests(x: unknown): asserts x is Manifests {
-  assertType<Manifests>(x)
+  assert<Manifests>(x)
 }
 
 export async function loadRawManifests(rootPath: string) {
