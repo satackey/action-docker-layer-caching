@@ -63,7 +63,7 @@
     /* Advanced Options */
     "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
     "plugins": [
-      { "transform": "typescript-is/lib/transform-inline/transformer" }
+      { "transform": "typia/lib/transform" }
     ]
   },
   "include": [

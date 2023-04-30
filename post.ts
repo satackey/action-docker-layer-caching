@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 
 import { LayerCache } from './src/LayerCache'
 import { ImageDetector } from './src/ImageDetector'
-import { assertType } from 'typescript-is'
+import { assert } from 'typia'
 
 const main = async () => {
   if (JSON.parse(core.getInput('skip-save', { required: true }))) {
@@ -16,9 +16,9 @@ const main = async () => {
   const alreadyExistingImages = JSON.parse(core.getState(`already-existing-images`))
   const restoredImages = JSON.parse(core.getState(`restored-images`))
 
-  assertType<string>(restoredKey)
-  assertType<string[]>(alreadyExistingImages)
-  assertType<string[]>(restoredImages)
+  assert<string>(restoredKey)
+  assert<string[]>(alreadyExistingImages)
+  assert<string[]>(restoredImages)
 
   const imageDetector = new ImageDetector()
 
